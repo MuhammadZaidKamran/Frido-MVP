@@ -1,0 +1,49 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:frido_app/Global/global.dart';
+import 'package:get/get.dart';
+
+class AuthController extends GetxController {
+  final _auth = FirebaseAuth.instance;
+
+  Future signUp({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    myLoadingDialog(Get.context!);
+    await _auth
+        .createUserWithEmailAndPassword(email: email, password: password)
+        .then((value) {
+          Get.back();
+          update();
+          mySuccessSnackBar(
+            context: Get.context!,
+            message: "Account Created Successfully!",
+          );
+        })
+        .catchError((error) {
+          Get.back();
+          update();
+          myErrorSnackBar(context: Get.context!, message: error.toString());
+        });
+  }
+
+  Future login({required String email, required String password}) async {
+    myLoadingDialog(Get.context!);
+    await _auth
+        .signInWithEmailAndPassword(email: email, password: password)
+        .then((value) {
+          Get.back();
+          update();
+          mySuccessSnackBar(
+            context: Get.context!,
+            message: "Login Successfully!",
+          );
+        })
+        .catchError((error) {
+          Get.back();
+          update();
+          myErrorSnackBar(context: Get.context!, message: error.toString());
+        });
+  }
+}
