@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:frido_app/Global/global.dart';
+import 'package:frido_app/View/Home/home_view.dart';
 import 'package:get/get.dart';
 
 class AuthController extends GetxController {
@@ -30,20 +31,21 @@ class AuthController extends GetxController {
 
   Future login({required String email, required String password}) async {
     myLoadingDialog(Get.context!);
-    await _auth
-        .signInWithEmailAndPassword(email: email, password: password)
-        .then((value) {
-          Get.back();
-          update();
-          mySuccessSnackBar(
-            context: Get.context!,
-            message: "Login Successfully!",
-          );
-        })
-        .catchError((error) {
-          Get.back();
-          update();
-          myErrorSnackBar(context: Get.context!, message: error.toString());
-        });
+    // await _auth
+    //     .signInWithEmailAndPassword(email: email, password: password)
+    //     .then((value) {
+    //       Get.back();
+    //       update();
+    //       mySuccessSnackBar(
+    //         context: Get.context!,
+    //         message: "Login Successfully!",
+    //       );
+    //     })
+    //     .catchError((error) {
+    //       Get.back();
+    //       update();
+    //       myErrorSnackBar(context: Get.context!, message: error.toString());
+    //     });
+    Get.offAll(()=> Home());
   }
 }

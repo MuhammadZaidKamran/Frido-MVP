@@ -1,4 +1,8 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" >
+         <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"/>
+         <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+        <uses-feature android:name="android.software.usage_stats" android:required="false"/>
+
     <application
         android:label="frido_app"
         android:name="${applicationName}"
