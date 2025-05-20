@@ -32,7 +32,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             },
             children: [
               buildPage(
-                title: "Slide 01",
+                title: "Slide 01111",
                 // description:
                 //     "Stay on top of your work with an intuitive task manager.",
                 // image: "assets/images/task1.png",
