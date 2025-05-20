@@ -32,22 +32,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             },
             children: [
               buildPage(
-                title: "Slide 01111",
-                // description:
-                //     "Stay on top of your work with an intuitive task manager.",
-                // image: "assets/images/task1.png",
+                title: "What is frido?",
+                description:
+                    "Frido helps you track your daily behaviors and rewards your consistency.",
+                image: "assets/images/onboarding_image_1.png",
               ),
               buildPage(
-                title: "Slide 02",
-                // description:
-                //     "Stay on top of your work with an intuitive task manager.",
-                // image: "assets/images/task1.png",
+                title: "Why Usage Data?",
+                description:
+                    "We use your behavior data to show you relevant and valuable offers.",
+                image: "assets/images/onboarding_image_2.png",
               ),
               buildPage(
-                title: "Slide 03",
-                // description:
-                //     "Boost your efficiency with reminders and scheduling.",
-                // image: "assets/images/task2.png",
+                title: "How Rewards Work?",
+                description:
+                    "Complete personalized offers to earn exciting rewards and benefits!",
+                image: "assets/images/onboarding_image_2.png",
               ),
             ],
           ),
@@ -55,18 +55,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             bottom: 50,
             left: 20,
             right: 20,
-            child: Column(
-              children: [
-                SmoothPageIndicator(
-                  controller: _controller,
-                  count: 3,
-                  effect: ExpandingDotsEffect(
-                    dotHeight: 8,
-                    dotWidth: 8,
-                    activeDotColor: blackColor,
-                  ),
-                ),
-                myHeight(0.06),
+            child:
                 isLastPage
                     ? MyButton(
                       onTap: () {
@@ -77,28 +66,40 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     : Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        MyButton(
-                          width: Get.width * 0.4,
-                          secondary: true,
-                          onTap: () {
+                        TextButton(
+                          onPressed: () {
                             _controller.jumpToPage(2);
                           },
-                          label: "Skip",
+                          child: Text(
+                            "Skip",
+                            style: TextStyle(color: blackColor),
+                          ),
                         ),
-                        MyButton(
-                          width: Get.width * 0.4,
+                        SmoothPageIndicator(
+                          controller: _controller,
+                          count: 3,
+                          effect: ExpandingDotsEffect(
+                            dotHeight: 8,
+                            dotWidth: 8,
+                            activeDotColor: mainThemeColor,
+                          ),
+                        ),
+                        InkWell(
                           onTap: () {
                             _controller.nextPage(
-                              duration: const Duration(milliseconds: 500),
+                              duration: Duration(milliseconds: 500),
                               curve: Curves.easeIn,
                             );
                           },
-                          label: "Next",
+                          child: Image.asset(
+                            "assets/images/next_btn.png",
+                            fit: BoxFit.cover,
+                            scale: 4,
+                            filterQuality: FilterQuality.high,
+                          ),
                         ),
                       ],
                     ),
-              ],
-            ),
           ),
         ],
       ),
@@ -107,28 +108,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget buildPage({
     required String title,
-    // required String description,
-    // required String image,
+    required String description,
+    required String image,
   }) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // Image.asset(
-        //   image,
-        //   height: 250,
-        //   fit: BoxFit.cover,
-        // ),
-        // myHeight(0.06),
-        Text(
-          title,
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        // myHeight(0.03),
-        // Padding(
-        //   padding: const EdgeInsets.symmetric(horizontal: 40),
-        //   child: Text(description, textAlign: TextAlign.center),
-        // ),
-      ],
+    return Padding(
+      padding: myPadding,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(child: Image.asset(image, height: 250, fit: BoxFit.cover)),
+          myHeight(0.06),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 32, color: Color(0XFF002A51)),
+          ),
+          myHeight(0.02),
+          Text(
+            description,
+            style: const TextStyle(color: Color(0XFF004E97), fontSize: 18),
+          ),
+        ],
+      ),
     );
   }
 }

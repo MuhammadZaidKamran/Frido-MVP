@@ -22,14 +22,13 @@ class _SplashViewState extends State<SplashView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text(
-          "Logo",
-          style: TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.bold,
-            color: blackColor,
-          ),
+      body: SizedBox(
+        width: Get.width,
+        height: Get.height,
+        child: Image.asset(
+          "assets/images/splash_screen.png",
+          fit: BoxFit.cover,
+          filterQuality: FilterQuality.high,
         ),
       ),
     );

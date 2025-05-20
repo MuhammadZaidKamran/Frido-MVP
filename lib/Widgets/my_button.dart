@@ -29,14 +29,14 @@ class MyButton extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        height: height ?? 50,
+        height: height ?? 55,
         width: width ?? Get.width,
         decoration: BoxDecoration(
           border: Border.all(
             color: secondary == true ? borderColor : Colors.transparent,
           ),
-          borderRadius: borderRadius ?? BorderRadius.circular(10),
-          color: secondary == true ? whiteColor : blackColor,
+          borderRadius: borderRadius ?? BorderRadius.circular(20),
+          color: secondary == true ? whiteColor : mainThemeColor,
         ),
         child: Center(
           child:

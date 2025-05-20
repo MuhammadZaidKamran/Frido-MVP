@@ -9,11 +9,11 @@ class AuthController extends GetxController {
   Future signUp({
     required String name,
     required String email,
-    required String password,
+    // required String password,
   }) async {
     myLoadingDialog(Get.context!);
     await _auth
-        .createUserWithEmailAndPassword(email: email, password: password)
+        .createUserWithEmailAndPassword(email: email, password: "12345678")
         .then((value) {
           Get.back();
           update();

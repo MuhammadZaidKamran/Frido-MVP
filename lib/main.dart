@@ -1,7 +1,19 @@
+// import 'package:firebase_core/firebase_core.dart';
+// import 'package:flutter/material.dart';
+// <<<<<<< Updated upstream
+// import 'package:flutter/services.dart';
+// =======
+// import 'package:frido_app/Global/colors.dart';
+// >>>>>>> Stashed changes
+// import 'package:frido_app/View/Home/home_view.dart';
+// import 'package:frido_app/firebase_options.dart';
+// import 'package:frido_app/splash_view.dart';
+// import 'package:get/get.dart';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:frido_app/View/Home/home_view.dart';
+import 'package:frido_app/Global/colors.dart';
 import 'package:frido_app/firebase_options.dart';
 import 'package:frido_app/splash_view.dart';
 import 'package:get/get.dart';
@@ -21,9 +33,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      theme: ThemeData(scaffoldBackgroundColor: whiteColor),
       debugShowCheckedModeBanner: false,
       title: "Frido App",
-      home: Home(),
+      home: SplashView(),
     );
   }
 }

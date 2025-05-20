@@ -51,7 +51,6 @@ class MyTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: width ?? double.infinity,
-      // height: height ?? 70,
       child: TextFormField(
         onTapOutside: (event) {
           FocusScope.of(context).unfocus();
