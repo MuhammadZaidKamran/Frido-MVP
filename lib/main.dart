@@ -14,6 +14,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frido_app/Global/colors.dart';
+import 'package:frido_app/View/Home/home_view.dart';
 import 'package:frido_app/firebase_options.dart';
 import 'package:frido_app/splash_view.dart';
 import 'package:get/get.dart';
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(scaffoldBackgroundColor: whiteColor,fontFamily: 'Poppins'),
       debugShowCheckedModeBanner: false,
       title: "Frido App",
-      home: SplashView(),
+      home: Home(),
     );
   }
 }
@@ -69,5 +70,17 @@ class InstalledApps {
       print("Error getting apps: $e");
       return [];
     }
+  }
+}
+
+class AppsUsage {
+  static const usageChannel = MethodChannel('com.example.app/usage_stats');
+
+  static Future<List<Map<String, dynamic>>> getUsageStats(String interval) async {
+    final List<dynamic> data = await usageChannel.invokeMethod(
+      "getUsageStats",
+      {"interval": interval},
+    );
+    return data.map((item) => Map<String, dynamic>.from(item)).toList();
   }
 }
