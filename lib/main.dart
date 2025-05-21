@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(scaffoldBackgroundColor: whiteColor,fontFamily: 'Poppins'),
       debugShowCheckedModeBanner: false,
       title: "Frido App",
-      home: Home(),
+      home: SplashView(),
     );
   }
 }
