@@ -47,7 +47,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 title: "How Rewards Work?",
                 description:
                     "Complete personalized offers to earn exciting rewards and benefits!",
-                image: "assets/images/onboarding_image_2.png",
+                image: "assets/images/onboarding_image_3.png",
               ),
             ],
           ),
@@ -121,7 +121,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           myHeight(0.06),
           Text(
             title,
-            style: const TextStyle(fontSize: 32, color: Color(0XFF002A51)),
+            style: const TextStyle(fontSize: 32,fontWeight: FontWeight.w600 , color: Color.fromARGB(255, 0, 42, 81)),
           ),
           myHeight(0.02),
           Text(
