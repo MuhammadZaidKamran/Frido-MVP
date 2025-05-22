@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frido_app/Global/colors.dart';
 import 'package:frido_app/View/OnboardingView/onboarding_view.dart';
+import 'package:frido_app/View/PermissionView/usage_permission_screen.dart';
 import 'package:get/get.dart';
 
 class SplashView extends StatefulWidget {
@@ -14,7 +15,7 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState() {
     Future.delayed(Duration(seconds: 3), () {
-      Get.off(() => OnboardingScreen());
+      Get.off(() => UsagePermissionScreen());
     });
     super.initState();
   }
