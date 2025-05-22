@@ -35,8 +35,8 @@ class HomeControllers {
 }
 
 
-  Future<List<Map>> getAppStats() async {
-    List<Map<String, dynamic>> stats = await AppsUsage.getUsageStats("daily");
+  Future<List<Map>> getAppStats(String interval) async {
+    List<Map<String, dynamic>> stats = await AppsUsage.getUsageStats(interval);
     stats.sort((a, b) => b['usageTime'].compareTo(a['usageTime']),);
     return stats;
   }

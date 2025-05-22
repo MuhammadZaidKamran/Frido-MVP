@@ -18,7 +18,7 @@ class _HomeState extends State<Home> {
 
  void fetchAppStats()async{
   isLoading = true;
-  appsStats = await homeController.getAppStats();
+  appsStats = await homeController.getAppStats('week');
   
   if(appsStats != null){
     isLoading = false;
