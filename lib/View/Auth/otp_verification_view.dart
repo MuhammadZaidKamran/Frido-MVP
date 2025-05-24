@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:frido_app/Controller/permission_controllers.dart';
 import 'package:frido_app/Global/colors.dart';
 import 'package:frido_app/Global/global.dart';
 import 'package:frido_app/View/Home/home_view.dart';
+import 'package:frido_app/View/PermissionView/usage_permission_screen.dart';
 import 'package:frido_app/Widgets/my_button.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
@@ -90,8 +92,20 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
             ),
             myHeight(0.04),
             MyButton(
-              onTap: () {
-                Get.offAll(() => Home());
+              onTap: () async {
+                bool isLocationPermissionGranted =
+                    await PermissionControllers.isLocationPermissionGranted();
+                bool isUsagePermissionGranted =
+                    await PermissionControllers.isUsagePermissionGranted();
+                myLoadingDialog(Get.context!);
+                FirebaseAuth.instance.signInAnonymously().then((value) {
+                  setState(() {});
+                  if (isUsagePermissionGranted && isLocationPermissionGranted) {
+                    Get.offAll(() => Home());
+                  } else {
+                    Get.off(() => UsagePermissionScreen());
+                  }
+                });
               },
               label: "Create Account",
             ),

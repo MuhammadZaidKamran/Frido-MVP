@@ -17,7 +17,7 @@ dependencies {
 android {
     namespace = "com.example.frido_app"
     compileSdk = 35
-    ndkVersion = "27.0.12077973"
+    ndkVersion = "25.1.8937393"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:frido_app/Global/colors.dart';
+import 'package:frido_app/Controller/permission_controllers.dart';
+import 'package:frido_app/View/Home/home_view.dart';
 import 'package:frido_app/View/OnboardingView/onboarding_view.dart';
 import 'package:frido_app/View/PermissionView/usage_permission_screen.dart';
 import 'package:get/get.dart';
@@ -12,10 +14,34 @@ class SplashView extends StatefulWidget {
 }
 
 class _SplashViewState extends State<SplashView> {
+  final _auth = FirebaseAuth.instance;
+
+  // void checkUsagePermission() async {
+  //   bool isUsagePermissionGranted =
+  //       await PermissionControllers.isUsagePermissionGranted();
+  //   print('usage permission : $isUsagePermissionGranted');
+
+  //   if (isUsagePermissionGranted) {
+  //     Get.off(() => LocationPermissionScreen());
+  //   }
+  // }
+
   @override
   void initState() {
-    Future.delayed(Duration(seconds: 3), () {
-      Get.off(() => UsagePermissionScreen());
+    Future.delayed(Duration(seconds: 3), () async {
+      bool isLocationPermissionGranted =
+          await PermissionControllers.isLocationPermissionGranted();
+      bool isUsagePermissionGranted =
+          await PermissionControllers.isUsagePermissionGranted();
+      if (_auth.currentUser == null) {
+        Get.off(() => OnboardingScreen());
+      } else if (_auth.currentUser != null) {
+        if (isUsagePermissionGranted && isLocationPermissionGranted) {
+          Get.offAll(() => Home());
+        } else {
+          Get.off(() => UsagePermissionScreen());
+        }
+      }
     });
     super.initState();
   }

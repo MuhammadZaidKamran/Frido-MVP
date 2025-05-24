@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-Color mainThemeColor = const Color(0XFF4B7FDB);
-Color textThemeColor = Color(0XFF002A51);
+Color mainThemeColor = const Color(0XFF4C1F99);
+Color textThemeColor = Color(0XFF250065);
 Color blueColor = const Color(0XFF568CF9);
 Color whiteColor = Colors.white;
 Color blackColor = Colors.black.withOpacity(0.75);
