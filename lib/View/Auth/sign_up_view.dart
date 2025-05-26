@@ -36,8 +36,8 @@ class _SignUpViewState extends State<SignUpView> {
                   myHeight(0.15),
                   Center(
                     child: Text(
-                      "Signup",
-                      style: TextStyle(fontSize: 35, color: textThemeColor),
+                      "Quick Signup",
+                      style: TextStyle(fontSize: 30, color: Colors.black),
                     ),
                   ),
                   myHeight(0.06),
@@ -46,7 +46,7 @@ class _SignUpViewState extends State<SignUpView> {
                     style: TextStyle(
                       color: textThemeColor,
                       fontWeight: FontWeight.w500,
-                      fontSize: 18,
+                      fontSize: 16,
                     ),
                   ),
                   myHeight(0.01),
@@ -54,19 +54,20 @@ class _SignUpViewState extends State<SignUpView> {
                     controller: userNameController,
                     label: "Your Name",
                   ),
-                  myHeight(0.04),
+                  myHeight(0.02),
                   Text(
                     "Email Address",
                     style: TextStyle(
                       color: textThemeColor,
                       fontWeight: FontWeight.w500,
-                      fontSize: 18,
+                      fontSize: 16,
                     ),
                   ),
                   myHeight(0.01),
                   MyTextField(controller: emailController, label: "Your Email"),
-                  myHeight(0.04),
+                  myHeight(0.02),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Checkbox(
                         activeColor: mainThemeColor,
@@ -79,9 +80,11 @@ class _SignUpViewState extends State<SignUpView> {
                       ),
                       SizedBox(
                         width: Get.width * 0.7,
-                        height: 50,
+                        // height: 50,
                         child: const Text(
                           'By creating an account  i accept Frido terms of use and  privacy policy ',
+                          textAlign: TextAlign.start,
+                          style: TextStyle(fontSize: 12),
                         ),
                       ),
                     ],
@@ -106,7 +109,7 @@ class _SignUpViewState extends State<SignUpView> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text("Already have an account? "),
+                      const Text("Already have an account? ",style:TextStyle(fontSize: 12) ,),
                       myWidth(0.01),
                       InkWell(
                         onTap: () {
@@ -117,6 +120,7 @@ class _SignUpViewState extends State<SignUpView> {
                           style: TextStyle(
                             color: mainThemeColor,
                             fontWeight: FontWeight.bold,
+                            fontSize: 12
                           ),
                         ),
                       ),

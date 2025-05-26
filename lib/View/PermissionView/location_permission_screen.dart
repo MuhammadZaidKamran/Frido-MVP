@@ -42,8 +42,9 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
             Text('location Permission'),
             SizedBox(height: 20),
             InkWell(
-              onTap: () {
-                PermissionControllers.requestLocationPermission();
+              onTap: ()async {
+                await PermissionControllers.requestLocationPermission();
+                checkLocationPermission();
               },
               child: Container(
                 color: Colors.deepPurpleAccent,

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:frido_app/Controller/permission_controllers.dart';
 import 'package:frido_app/Global/colors.dart';
 import 'package:frido_app/Global/global.dart';
 import 'package:frido_app/View/Home/home_view.dart';
+import 'package:frido_app/View/PermissionView/location_permission_screen.dart';
+import 'package:frido_app/View/PermissionView/usage_permission_screen.dart';
 import 'package:frido_app/Widgets/my_button.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
@@ -21,6 +24,43 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
   final pinField04 = TextEditingController();
   final pinField05 = TextEditingController();
   final pinField06 = TextEditingController();
+bool usagePermission = false;
+bool locationPermission = false;
+@override
+  void initState() {
+    // TODO: implement initState
+    checkInitStats();
+    super.initState();
+  }
+void checkInitStats() async {
+    
+
+    usagePermission =
+        await PermissionControllers.isUsagePermissionGranted();
+     locationPermission =
+        await PermissionControllers.isLocationPermissionGranted();
+    print('location perm : $locationPermission');
+    print('usage perm : $usagePermission');
+
+      Future.delayed(Duration(seconds: 3), () {
+      
+
+        if (!usagePermission) {
+          Get.off(() => UsagePermissionScreen());
+          return;
+        }
+
+        if (!locationPermission) {
+          Get.off(() => LocationPermissionScreen());
+          return;
+        }
+
+        if(locationPermission && usagePermission){
+          Get.off(() => HomeView());
+        }
+      });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

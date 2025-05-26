@@ -30,6 +30,8 @@ class _UsagePermissionScreenState extends State<UsagePermissionScreen> {
   }
 
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,13 +45,25 @@ class _UsagePermissionScreenState extends State<UsagePermissionScreen> {
             Text('Usage Permission'),
             SizedBox(height: 20),
             InkWell(
-              onTap: () {
-                PermissionControllers.openUsageSettings();
+              onTap: ()async {
+               await PermissionControllers.openUsageSettings();
+              checkUsagePermission();
               },
-              child: Container(
-                color: Colors.deepPurpleAccent,
-                padding: EdgeInsets.all(20),
-                child: Text('Give Permission', style: TextStyle(fontSize: 20,color: Colors.white),),
+              child: Column(
+                children: [
+                  Container(
+                    color: Colors.deepPurpleAccent,
+                    padding: EdgeInsets.all(20),
+                    child: Text('Give Permission', style: TextStyle(fontSize: 20,color: Colors.white),),
+                  ),
+                  InkWell(
+                    onTap:(){ Get.off(()=> LocationPermissionScreen());},
+                    child: Container(
+                      
+                      child: Text('next'),
+                    ),
+                  )
+                ],
               ),
             ),
           ],

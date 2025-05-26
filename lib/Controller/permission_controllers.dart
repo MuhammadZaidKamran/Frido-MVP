@@ -1,4 +1,6 @@
 import 'package:flutter/services.dart';
+import 'package:frido_app/View/PermissionView/location_permission_screen.dart';
+import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class PermissionControllers {
@@ -16,6 +18,7 @@ class PermissionControllers {
   // Open Usage Access Settings
   static Future<void> openUsageSettings() async {
     await _channel.invokeMethod('openUsageSettings');
+    
   }
 
   // Check Location permission

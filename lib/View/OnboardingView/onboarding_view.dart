@@ -32,27 +32,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             },
             children: [
               buildPage(
-                title: "What is frido?",
+                title: "Your Data. Your Rules.",
                 description:
-                    "Frido helps you track your daily behaviors and rewards your consistency.",
-                image: "assets/images/onboarding_image_1.png",
+                    "Every tap, scroll, and swipe tells a story — your story. Frido helps you take control of your digital behavior and turn it into value, on your terms.",
+                image: "assets/images/onboard1.png",
               ),
               buildPage(
-                title: "Why Usage Data?",
+                title: "Earn From Your Attention",
                 description:
-                    "We use your behavior data to show you relevant and valuable offers.",
-                image: "assets/images/onboarding_image_2.png",
+                    "Brands pay millions to reach people like you With Frido, you get paid simply being you — viewing, engaging, or even just receiving offers.",
+                image: "assets/images/onboard2.png",
               ),
               buildPage(
-                title: "How Rewards Work?",
+                title: "Masked. Secure. Always.",
                 description:
-                    "Complete personalized offers to earn exciting rewards and benefits!",
-                image: "assets/images/onboarding_image_3.png",
+                    "Your personal identity stays hidden. Frido uses  personas to match you with relevant promotions — privacy-first, always.",
+                image: "assets/images/onboard3.png",
               ),
             ],
           ),
           Positioned(
-            bottom: 50,
+            bottom: 60,
             left: 20,
             right: 20,
             child:
@@ -72,7 +72,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           },
                           child: Text(
                             "Skip",
-                            style: TextStyle(color: blackColor),
+                            style: TextStyle(color: Colors.black45,fontSize: 14,fontWeight: FontWeight.w500),
                           ),
                         ),
                         SmoothPageIndicator(
@@ -91,12 +91,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               curve: Curves.easeIn,
                             );
                           },
-                          child: Image.asset(
-                            "assets/images/next_btn.png",
-                            fit: BoxFit.cover,
-                            scale: 4,
-                            filterQuality: FilterQuality.high,
-                          ),
+                          child: Container(
+                            height: 70,
+                            width: 70,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              gradient: LinearGradient(colors: [Color(0xffA774FE), Color(0xff4C1F99)] , end: Alignment.bottomCenter , begin: Alignment.topCenter,  )
+                            ),
+                            child: Icon(Icons.arrow_forward, color: Colors.white, size: 32,),
+                          )
                         ),
                       ],
                     ),
@@ -115,18 +118,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       padding: myPadding,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Center(child: Image.asset(image, height: 250, fit: BoxFit.cover)),
+          Center(child: Image.asset(image, height: 300, fit: BoxFit.cover)),
           myHeight(0.06),
           Text(
             title,
-            style: const TextStyle(fontSize: 32,fontWeight: FontWeight.w600 , color: Color.fromARGB(255, 0, 42, 81)),
+            style: const TextStyle(fontSize: 20,fontWeight: FontWeight.w600 , color: Colors.black,),
+            textAlign: TextAlign.center,
           ),
           myHeight(0.02),
           Text(
             description,
-            style: const TextStyle(color: Color(0XFF004E97), fontSize: 18),
+            style: const TextStyle(color: Color(0xFFAA7ABC), fontSize: 12),
+            textAlign: TextAlign.center,
           ),
         ],
       ),

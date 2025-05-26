@@ -1,7 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:frido_app/Controller/auth_controller.dart';
+import 'package:frido_app/Controller/permission_controllers.dart';
 import 'package:frido_app/Global/colors.dart';
+import 'package:frido_app/View/Auth/sign_up_view.dart';
+import 'package:frido_app/View/Home/home_view.dart';
 import 'package:frido_app/View/OnboardingView/onboarding_view.dart';
+import 'package:frido_app/View/PermissionView/location_permission_screen.dart';
 import 'package:frido_app/View/PermissionView/usage_permission_screen.dart';
+import 'package:frido_app/firebase_options.dart';
 import 'package:get/get.dart';
 
 class SplashView extends StatefulWidget {
@@ -14,10 +22,43 @@ class SplashView extends StatefulWidget {
 class _SplashViewState extends State<SplashView> {
   @override
   void initState() {
-    Future.delayed(Duration(seconds: 3), () {
-      Get.off(() => UsagePermissionScreen());
-    });
+    checkInitStats();
     super.initState();
+  }
+
+  void checkInitStats() async {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+      name: 'frido-app',
+    );
+
+    bool usagePermission =
+        await PermissionControllers.isUsagePermissionGranted();
+    bool locationPermission =
+        await PermissionControllers.isLocationPermissionGranted();
+    bool currentUser = await AuthController().isCurrentUser();
+    print('location perm : $locationPermission');
+    print('usage perm : $usagePermission');
+    print('currentUser : $currentUser');
+
+      Future.delayed(Duration(seconds: 3), () {
+        if (!currentUser) {
+          Get.off(() => OnboardingScreen());
+          return;
+        }
+
+        if (!usagePermission) {
+          Get.off(() => UsagePermissionScreen());
+          return;
+        }
+
+        if (!locationPermission) {
+          Get.off(() => LocationPermissionScreen());
+          return;
+        }
+
+        Get.off(() => HomeView());
+      });
   }
 
   @override
@@ -26,10 +67,21 @@ class _SplashViewState extends State<SplashView> {
       body: SizedBox(
         width: Get.width,
         height: Get.height,
-        child: Image.asset(
-          "assets/images/splash_screen.png",
-          fit: BoxFit.cover,
-          filterQuality: FilterQuality.high,
+        child: Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xff7F34FF), Color(0xff4C1F99)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: Image.asset(
+            'assets/images/splash_logo.png',
+            width: 200,
+            fit: BoxFit.cover,
+            filterQuality: FilterQuality.high,
+          ),
         ),
       ),
     );
