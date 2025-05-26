@@ -18,7 +18,7 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen> {
   bool isLocationPermissionGranted = await PermissionControllers.isLocationPermissionGranted();
   print('location permission : $isLocationPermissionGranted');
    if(isLocationPermissionGranted){
-    Get.off(()=>Home());
+    Get.off(()=>HomeView());
    }
 }
 

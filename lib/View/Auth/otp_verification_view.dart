@@ -91,7 +91,7 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
             myHeight(0.04),
             MyButton(
               onTap: () {
-                Get.offAll(() => Home());
+                Get.offAll(() => HomeView());
               },
               label: "Create Account",
             ),

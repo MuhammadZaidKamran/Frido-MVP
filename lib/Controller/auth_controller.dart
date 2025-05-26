@@ -46,6 +46,6 @@ class AuthController extends GetxController {
     //       update();
     //       myErrorSnackBar(context: Get.context!, message: error.toString());
     //     });
-    Get.offAll(()=> Home());
+    Get.offAll(()=> HomeView());
   }
 }
