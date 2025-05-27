@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frido_app/Controller/permission_controllers.dart';
+import 'package:frido_app/Global/colors.dart';
+import 'package:frido_app/Global/global.dart';
 import 'package:frido_app/View/PermissionView/location_permission_screen.dart';
+import 'package:frido_app/Widgets/my_button.dart';
 import 'package:get/get.dart';
 import 'package:get/utils.dart';
 
@@ -35,36 +38,41 @@ class _UsagePermissionScreenState extends State<UsagePermissionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
+      body: Padding(
+        padding: myPadding,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Usage Permission'),
-            SizedBox(height: 20),
-            InkWell(
-              onTap: ()async {
-               await PermissionControllers.openUsageSettings();
-              checkUsagePermission();
-              },
-              child: Column(
-                children: [
-                  Container(
-                    color: Colors.deepPurpleAccent,
-                    padding: EdgeInsets.all(20),
-                    child: Text('Give Permission', style: TextStyle(fontSize: 20,color: Colors.white),),
-                  ),
-                  InkWell(
-                    onTap:(){ Get.off(()=> LocationPermissionScreen());},
-                    child: Container(
-                      
-                      child: Text('next'),
-                    ),
-                  )
-                ],
+            myHeight(0.15),
+            Center(
+              child: Image.asset(
+                "assets/images/usage_permission.png",
+                fit: BoxFit.cover,
+                height: Get.height * 0.35,
               ),
+            ),
+            myHeight(0.06),
+            Text(
+              "Screen Time Access",
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.w500,
+                color: textThemeColor,
+              ),
+            ),
+            myHeight(0.02),
+            Text(
+              "Grant Frido permission to track your screen time.",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w200),
+            ),
+            Spacer(),
+            MyButton(
+              onTap: () async {
+                await PermissionControllers.openUsageSettings().then((value) {
+                  checkUsagePermission();
+                });
+              },
+              label: "Allow Access",
             ),
           ],
         ),

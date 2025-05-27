@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 // ignore: must_be_immutable
 class TaskOptionsContainer extends StatelessWidget {
-  TaskOptionsContainer({
-    super.key,
-    this.width,
-    required this.title,
-    required this.textColor,
-    required this.backgroundColor,
-    required this.onTap,
-    required this.borderColor,
-  });
+  TaskOptionsContainer(
+      {super.key,
+      this.width,
+      required this.title,
+      required this.textColor,
+      required this.backgroundColor,
+      required this.onTap,
+      required this.borderColor});
   double? width;
   final String title;
   final Color textColor;
@@ -34,7 +32,10 @@ class TaskOptionsContainer extends StatelessWidget {
         child: Center(
           child: Text(
             title,
-            style: TextStyle(fontSize: Get.width * 0.03, color: textColor),
+            style: TextStyle(
+              fontSize: 16,
+              color: textColor,
+            ),
           ),
         ),
       ),

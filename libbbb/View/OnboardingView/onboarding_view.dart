@@ -72,11 +72,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           },
                           child: Text(
                             "Skip",
-                            style: TextStyle(
-                              color: Colors.black45,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: TextStyle(color: Colors.black45,fontSize: 14,fontWeight: FontWeight.w500),
                           ),
                         ),
                         SmoothPageIndicator(
@@ -100,18 +96,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             width: 70,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(50),
-                              gradient: LinearGradient(
-                                colors: [Color(0xffA774FE), Color(0xff4C1F99)],
-                                end: Alignment.bottomCenter,
-                                begin: Alignment.topCenter,
-                              ),
+                              gradient: LinearGradient(colors: [Color(0xffA774FE), Color(0xff4C1F99)] , end: Alignment.bottomCenter , begin: Alignment.topCenter,  )
                             ),
-                            child: Icon(
-                              Icons.arrow_forward,
-                              color: Colors.white,
-                              size: 32,
-                            ),
-                          ),
+                            child: Icon(Icons.arrow_forward, color: Colors.white, size: 32,),
+                          )
                         ),
                       ],
                     ),
@@ -136,17 +124,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           myHeight(0.06),
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
-            ),
+            style: const TextStyle(fontSize: 20,fontWeight: FontWeight.w600 , color: Colors.black,),
             textAlign: TextAlign.center,
           ),
           myHeight(0.02),
           Text(
             description,
-            style: const TextStyle(fontSize: 12),
+            style: const TextStyle(color: Color(0xFFAA7ABC), fontSize: 12),
             textAlign: TextAlign.center,
           ),
         ],

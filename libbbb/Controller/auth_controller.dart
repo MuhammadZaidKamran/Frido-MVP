@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:frido_app/Global/global.dart';
 import 'package:frido_app/View/Home/home_view.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthController extends GetxController {
   final _auth = FirebaseAuth.instance;
@@ -9,7 +11,7 @@ class AuthController extends GetxController {
 
 
 Future isCurrentUser()async{
-  final user = _auth.currentUser;
+  final user = await _auth.currentUser;
   if(user != null){
     return true;
   }else{

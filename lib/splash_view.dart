@@ -3,8 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:frido_app/Controller/auth_controller.dart';
 import 'package:frido_app/Controller/permission_controllers.dart';
-import 'package:frido_app/Global/colors.dart';
-import 'package:frido_app/View/Auth/sign_up_view.dart';
 import 'package:frido_app/View/Home/home_view.dart';
 import 'package:frido_app/View/OnboardingView/onboarding_view.dart';
 import 'package:frido_app/View/PermissionView/location_permission_screen.dart';
@@ -20,46 +18,58 @@ class SplashView extends StatefulWidget {
 }
 
 class _SplashViewState extends State<SplashView> {
+  final _auth = FirebaseAuth.instance;
   @override
   void initState() {
-    checkInitStats();
+    Future.delayed(Duration(seconds: 3), () async {
+      bool isLocationPermissionGranted =
+          await PermissionControllers.isLocationPermissionGranted();
+      bool isUsagePermissionGranted =
+          await PermissionControllers.isUsagePermissionGranted();
+      if (_auth.currentUser == null) {
+        Get.off(() => OnboardingScreen());
+      } else if (_auth.currentUser != null) {
+        if (isUsagePermissionGranted && isLocationPermissionGranted) {
+          Get.offAll(() => HomeView());
+        } else {
+          Get.off(() => UsagePermissionScreen());
+        }
+      }
+    });
+    // checkInitStats();
     super.initState();
   }
 
-  void checkInitStats() async {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-      name: 'frido-app',
-    );
+  // void checkInitStats() async {
 
-    bool usagePermission =
-        await PermissionControllers.isUsagePermissionGranted();
-    bool locationPermission =
-        await PermissionControllers.isLocationPermissionGranted();
-    bool currentUser = await AuthController().isCurrentUser();
-    print('location perm : $locationPermission');
-    print('usage perm : $usagePermission');
-    print('currentUser : $currentUser');
+  //   bool usagePermission =
+  //       await PermissionControllers.isUsagePermissionGranted();
+  //   bool locationPermission =
+  //       await PermissionControllers.isLocationPermissionGranted();
+  //   bool currentUser = await AuthController().isCurrentUser();
+  //   print('location perm : $locationPermission');
+  //   print('usage perm : $usagePermission');
+  //   print('currentUser : $currentUser');
 
-      Future.delayed(Duration(seconds: 3), () {
-        if (!currentUser) {
-          Get.off(() => OnboardingScreen());
-          return;
-        }
+  //     Future.delayed(Duration(seconds: 3), () {
+  //       if (!currentUser) {
+  //         Get.off(() => OnboardingScreen());
+  //         return;
+  //       }
 
-        if (!usagePermission) {
-          Get.off(() => UsagePermissionScreen());
-          return;
-        }
+  //       if (!usagePermission) {
+  //         Get.off(() => UsagePermissionScreen());
+  //         return;
+  //       }
 
-        if (!locationPermission) {
-          Get.off(() => LocationPermissionScreen());
-          return;
-        }
+  //       if (!locationPermission) {
+  //         Get.off(() => LocationPermissionScreen());
+  //         return;
+  //       }
 
-        Get.off(() => HomeView());
-      });
-  }
+  //       Get.off(() => HomeView());
+  //     });
+  // }
 
   @override
   Widget build(BuildContext context) {
