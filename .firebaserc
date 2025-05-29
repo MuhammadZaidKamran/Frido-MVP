@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "frido-app-41ef7"
-  }
+    "default": "frido-11d62"
+  },
+  "targets": {},
+  "etags": {}
 }

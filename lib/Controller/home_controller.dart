@@ -32,6 +32,8 @@ class HomeControllers {
     }
 
     filtered.sort((a, b) => (b['filteredUsage'] as int).compareTo(a['filteredUsage'] as int));
+    
+    
     return filtered;
   }
 }

@@ -34,7 +34,6 @@ class _HomeViewState extends State<HomeView> {
       isLoading = true;
       selectedFilter = interval;
     });
-
     appsStats = await homeController.getAppStats(interval);
     setState(() {
       isLoading = false;
