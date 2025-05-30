@@ -240,6 +240,8 @@ class _SignUpViewState extends State<SignUpView> {
 
       if (response.statusCode == 200) {
         setState(() => _status = 'OTP sent to ${emailController.text}');
+        // store otp in local storage
+        // navigate to verification screen
               print('///////////////////////$_status');
 
       } else {
@@ -253,13 +255,7 @@ class _SignUpViewState extends State<SignUpView> {
     }
   }
 
-  void verifyOtp() {
-    if (otpController.text == _generatedOtp) {
-      setState(() => _status = 'OTP verified successfully!');
-    } else {
-      setState(() => _status = 'Invalid OTP!');
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -273,11 +269,8 @@ class _SignUpViewState extends State<SignUpView> {
             SizedBox(height: 10),
             ElevatedButton(onPressed: sendOtp, child: Text('Send OTP')),
             SizedBox(height: 20),
-            TextField(controller: otpController, decoration: InputDecoration(labelText: 'Enter OTP')),
-            SizedBox(height: 10),
-            ElevatedButton(onPressed: verifyOtp, child: Text('Verify OTP')),
-            SizedBox(height: 20),
-            Text(_status, style: TextStyle(fontWeight: FontWeight.bold)),
+           
+          
           ],
         ),
       ),
