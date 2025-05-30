@@ -59,7 +59,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 isLastPage
                     ? MyButton(
                       onTap: () {
-                        Get.off(() => const SignUpView());
+                        Get.off(() =>  SignUpView());
                       },
                       label: "Get Started",
                     )

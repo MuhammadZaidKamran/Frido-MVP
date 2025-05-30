@@ -1,28 +1,29 @@
+require('dotenv').config();
 const functions = require('firebase-functions');
 const nodemailer = require('nodemailer');
-require('dotenv').config();
-// Configure your Gmail account here
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER,               // Your Gmail address
-    pass: process.env.EMAIL_PASS,                   // Gmail App Password (see notes below)
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   }
 });
 
-// Callable Cloud Function to send email
-exports.sendEmail = functions.https.onCall(async (data, context) => {
+exports.sendEmail = functions.https.onRequest(async (req, res) => {
+  const { to, subject, message } = req.body;
+
   const mailOptions = {
     from: process.env.EMAIL_USER,
-    to: data.to,             // Recipient email passed from Flutter
-    subject: data.subject,   // Subject passed from Flutter
-    text: data.message       // Message passed from Flutter
+    to,
+    subject,
+    text: message,
   };
 
   try {
     await transporter.sendMail(mailOptions);
-    return { success: true };
+    res.status(200).send({ success: true });
   } catch (error) {
-    return { success: false, error: error.toString() };
+    res.status(500).send({ success: false, error: error.toString() });
   }
 });
