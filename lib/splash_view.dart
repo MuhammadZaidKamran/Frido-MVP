@@ -9,6 +9,7 @@ import 'package:frido_app/View/PermissionView/location_permission_screen.dart';
 import 'package:frido_app/View/PermissionView/usage_permission_screen.dart';
 import 'package:frido_app/firebase_options.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -22,13 +23,15 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState() {
     Future.delayed(Duration(seconds: 3), () async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String uniqueId = prefs.getString('uniqueId') ?? '';
       bool isLocationPermissionGranted =
           await PermissionControllers.isLocationPermissionGranted();
       bool isUsagePermissionGranted =
           await PermissionControllers.isUsagePermissionGranted();
-      if (_auth.currentUser == null) {
+      if (uniqueId == '' || uniqueId.isEmpty) {
         Get.off(() => OnboardingScreen());
-      } else if (_auth.currentUser != null) {
+      } else if (uniqueId.isNotEmpty || uniqueId != '') {
         if (isUsagePermissionGranted && isLocationPermissionGranted) {
           Get.offAll(() => HomeView());
         } else {
