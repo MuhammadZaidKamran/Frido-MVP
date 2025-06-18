@@ -222,7 +222,7 @@ class _SignUpViewState extends State<SignUpView> {
   final userNameController = TextEditingController();
   final otpController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final authController = Get.put(AuthController());
+  // final authController = Get.put(AuthController());
   bool _isTermsAccepted = false;
   bool _loading = false;
 

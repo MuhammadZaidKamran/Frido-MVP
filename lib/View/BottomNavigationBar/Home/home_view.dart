@@ -20,8 +20,8 @@ class _HomeViewState extends State<HomeView> {
   bool isLoading = true;
   String selectedFilter = 'daily';
   int tabIndex = 0;
-  int displayItemCount = 5;
   bool isExpanded = false;
+  int totalUsage = 0;
 
   @override
   void initState() {
@@ -29,32 +29,55 @@ class _HomeViewState extends State<HomeView> {
     fetchAppStats();
   }
 
+  // Helper function to format milliseconds to "Xh Ym"
+  String formatHoursMinutes(int millis) {
+    if (millis <= 0) return "0h 0m";
+
+    int totalSeconds = millis ~/ 1000;
+    int hours = totalSeconds ~/ 3600;
+    int minutes = (totalSeconds % 3600) ~/ 60;
+
+    return "${hours}h ${minutes}m";
+  }
+
+  // Get the appropriate title based on selected filter
+  String getScreenTimeTitle() {
+    switch (selectedFilter) {
+      case 'daily':
+        return "Today, Screen Time";
+      case 'weekly':
+        return "This Week, Screen Time";
+      case 'monthly':
+        return "This Month, Screen Time";
+      case 'yearly':
+        return "This Year, Screen Time";
+      default:
+        return "Screen Time";
+    }
+  }
+
   Future<void> fetchAppStats([String interval = 'daily']) async {
     setState(() {
       isLoading = true;
       selectedFilter = interval;
+      isExpanded = false;
     });
+
     appsStats = await homeController.getAppStats(interval);
+
+    // Calculate total usage for the selected interval
+    totalUsage = 0;
+    for (var app in appsStats) {
+      totalUsage += ((app['usageStats']?[interval] ?? 0) as int);
+    }
+
     setState(() {
       isLoading = false;
     });
   }
 
-  Widget filterButton(String label) {
-    final isSelected = selectedFilter == label.toLowerCase();
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected ? Colors.blue : Colors.grey[300],
-        foregroundColor: isSelected ? Colors.white : Colors.black,
-      ),
-      onPressed: () => fetchAppStats(label.toLowerCase()),
-      child: Text(label),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    List itemsToDisplay = appsStats.take(displayItemCount).toList();
     return Scaffold(
       appBar: AppBar(backgroundColor: whiteColor, toolbarHeight: 10),
       body: SingleChildScrollView(
@@ -81,10 +104,9 @@ class _HomeViewState extends State<HomeView> {
                   boxShadow: [
                     BoxShadow(
                       color: blackColor.withOpacity(0.2),
-                      // color: Colors.grey.withOpacity(0.2),
                       spreadRadius: 5,
                       blurRadius: 10,
-                      offset: Offset(0, 3), // changes position of shadow
+                      offset: Offset(0, 3),
                     ),
                   ],
                 ),
@@ -92,7 +114,7 @@ class _HomeViewState extends State<HomeView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Today, Screen Time",
+                      getScreenTimeTitle(), // Dynamic title based on filter
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -100,7 +122,7 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     myHeight(0.01),
                     Text(
-                      "5h 24m",
+                      formatHoursMinutes(totalUsage), // Dynamic total usage
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.w600,
@@ -109,8 +131,6 @@ class _HomeViewState extends State<HomeView> {
                   ],
                 ),
               ),
-              // myHeight(0.03),
-              // Filter buttons row
               myHeight(0.03),
               Container(
                 decoration: BoxDecoration(
@@ -193,18 +213,7 @@ class _HomeViewState extends State<HomeView> {
                   ],
                 ),
               ),
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //   children: [
-              //     filterButton('Daily'),
-              //     filterButton('Weekly'),
-              //     filterButton('Monthly'),
-              //     // filterButton('Yearly'),
-              //   ],
-              // ),
-              // const SizedBox(height: 20),
               myHeight(0.03),
-              // Content area
               Container(
                 padding: EdgeInsets.all(12),
                 width: Get.width,
@@ -231,47 +240,10 @@ class _HomeViewState extends State<HomeView> {
                       ),
                     ),
                     myHeight(0.01),
-                    SizedBox(
-                      child: ListView.separated(
-                        padding: EdgeInsets.zero,
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: itemsToDisplay.length,
-                        separatorBuilder: (context, index) => myHeight(0.03),
-                        itemBuilder: (context, index) {
-                          final app = itemsToDisplay[index];
-                          return ListTile(
-                            leading: homeController.imageFromBase64String(
-                              app['iconBase64'],
-                            ),
-                            title: Text(app['name'] ?? 'Unknown App'),
-                            trailing: Text(
-                              homeController.formatDurationFromMillis(
-                                app['usageStats']?[selectedFilter] ?? 0,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    if (!isExpanded)
-                      Center(
-                        child: TextButton(
-                          onPressed: () {
-                            setState(() {
-                              displayItemCount = appsStats.length;
-                              isExpanded = true;
-                            });
-                          },
-                          child: Text(
-                            'See all items',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
+                    if (isLoading)
+                      Center(child: CircularProgressIndicator())
+                    else
+                      _buildAppListSection(),
                   ],
                 ),
               ),
@@ -313,35 +285,71 @@ class _HomeViewState extends State<HomeView> {
                   ],
                 ),
               ),
-              // Expanded(
-              //   child:
-              //       isLoading
-              //           ? const Center(child: CircularProgressIndicator())
-              //           : appsStats.isEmpty
-              //           ? const Center(child: Text('No data available'))
-              //           : ListView.separated(
-              //             itemCount: appsStats.length,
-              //             separatorBuilder: (_, __) => const Divider(),
-              //             itemBuilder: (context, index) {
-              //               final app = appsStats[index];
-              //               return ListTile(
-              //                 leading: homeController.imageFromBase64String(
-              //                   app['iconBase64'],
-              //                 ),
-              //                 title: Text(app['name'] ?? 'Unknown App'),
-              //                 trailing: Text(
-              //                   homeController.formatDurationFromMillis(
-              //                     app['usageStats']?[selectedFilter] ?? 0,
-              //                   ),
-              //                 ),
-              //               );
-              //             },
-              //           ),
-              // ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildAppListSection() {
+    // Filter out apps with zero usage
+    final nonZeroApps =
+        appsStats.where((app) {
+          final usage = app['usageStats']?[selectedFilter] ?? 0;
+          return usage > 0;
+        }).toList();
+
+    if (nonZeroApps.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20.0),
+          child: Text('No app usage data available'),
+        ),
+      );
+    }
+
+    // Determine which items to display
+    final itemsToDisplay =
+        isExpanded ? nonZeroApps : nonZeroApps.take(5).toList();
+
+    return Column(
+      children: [
+        ListView.separated(
+          padding: EdgeInsets.zero,
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: itemsToDisplay.length,
+          separatorBuilder: (context, index) => myHeight(0.03),
+          itemBuilder: (context, index) {
+            final app = itemsToDisplay[index];
+            return ListTile(
+              leading: homeController.imageFromBase64String(app['iconBase64']),
+              title: Text(app['name'] ?? 'Unknown App'),
+              trailing: Text(
+                homeController.formatDurationFromMillis(
+                  app['usageStats']?[selectedFilter] ?? 0,
+                ),
+              ),
+            );
+          },
+        ),
+        // Show toggle button only when there are more than 5 apps
+        if (nonZeroApps.length > 5)
+          Center(
+            child: TextButton(
+              onPressed: () {
+                setState(() {
+                  isExpanded = !isExpanded;
+                });
+              },
+              child: Text(
+                isExpanded ? 'See less items' : 'See all items',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

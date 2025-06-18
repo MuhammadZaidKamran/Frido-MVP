@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frido_app/Controller/permission_controllers.dart';
-import 'package:frido_app/View/Home/home_view.dart';
+import 'package:frido_app/View/BottomNavigationBar/Home/home_view.dart';
 import 'package:get/get.dart';
 import 'package:get/utils.dart';
 

@@ -44,6 +44,7 @@ dependencies:
   cloud_functions: ^5.5.1
   firebase_app_check: ^0.3.2+6
   http: ^1.4.0
+  firebase_database: ^11.3.7
 
 dev_dependencies:
   flutter_test:
@@ -71,9 +72,9 @@ flutter:
     - assets/images/
 
   fonts:
-   - family: Poppins
-     fonts:
-       - asset: assets/fonts/Poppins-Regular.ttf
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

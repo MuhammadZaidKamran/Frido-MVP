@@ -5,7 +5,7 @@ import 'package:frido_app/Controller/auth_controller.dart';
 import 'package:frido_app/Controller/permission_controllers.dart';
 import 'package:frido_app/Global/colors.dart';
 import 'package:frido_app/View/Auth/sign_up_view.dart';
-import 'package:frido_app/View/Home/home_view.dart';
+import 'package:frido_app/View/BottomNavigationBar/Home/home_view.dart';
 import 'package:frido_app/View/OnboardingView/onboarding_view.dart';
 import 'package:frido_app/View/PermissionView/location_permission_screen.dart';
 import 'package:frido_app/View/PermissionView/usage_permission_screen.dart';

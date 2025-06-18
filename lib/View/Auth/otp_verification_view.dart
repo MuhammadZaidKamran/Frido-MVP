@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:frido_app/View/BottomNavigationBar/bottom_navigation_bar.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frido_app/Controller/permission_controllers.dart';
 import 'package:frido_app/Global/colors.dart';
 import 'package:frido_app/Global/global.dart';
-import 'package:frido_app/View/Home/home_view.dart';
+import 'package:frido_app/View/BottomNavigationBar/Home/home_view.dart';
 import 'package:frido_app/View/PermissionView/location_permission_screen.dart';
 import 'package:frido_app/View/PermissionView/usage_permission_screen.dart';
 import 'package:frido_app/Widgets/my_button.dart';
@@ -86,7 +87,7 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
             }
 
             if (locationPermission && usagePermission) {
-              Get.offAll(() => HomeView());
+              Get.offAll(() => BottomNavigationBarView());
               mySuccessSnackBar(
                 context: Get.context!,
                 message: "Account Created Successfully",
@@ -244,7 +245,6 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
             MyButton(
               onTap: () {
                 otpVerification();
-
                 // Get.offAll(() => HomeView());
               },
               label: "Create Account",

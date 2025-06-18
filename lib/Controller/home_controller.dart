@@ -17,7 +17,7 @@ class HomeControllers {
     Duration duration = Duration(milliseconds: millis);
     int hours = duration.inHours;
     int minutes = duration.inMinutes.remainder(60);
-    return '${hours}h ${minutes}m';
+    return hours != 0 ? '${hours}h ${minutes}m' : minutes != 0 ? '${minutes}m' : '';
   }
 
   Future<List<Map<String, dynamic>>> getAppStats(String filter) async {

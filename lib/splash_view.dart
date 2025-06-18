@@ -3,7 +3,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:frido_app/Controller/auth_controller.dart';
 import 'package:frido_app/Controller/permission_controllers.dart';
-import 'package:frido_app/View/Home/home_view.dart';
+import 'package:frido_app/View/BottomNavigationBar/Promotions/save_ad_view_data.dart';
+import 'package:frido_app/View/BottomNavigationBar/Promotions/save_promo_data_view.dart';
+import 'package:frido_app/View/BottomNavigationBar/bottom_navigation_bar.dart';
+import 'package:frido_app/View/BottomNavigationBar/Home/home_view.dart';
 import 'package:frido_app/View/OnboardingView/onboarding_view.dart';
 import 'package:frido_app/View/PermissionView/location_permission_screen.dart';
 import 'package:frido_app/View/PermissionView/usage_permission_screen.dart';
@@ -33,7 +36,9 @@ class _SplashViewState extends State<SplashView> {
         Get.off(() => OnboardingScreen());
       } else if (uniqueId.isNotEmpty || uniqueId != '') {
         if (isUsagePermissionGranted && isLocationPermissionGranted) {
-          Get.offAll(() => HomeView());
+          Get.offAll(() => BottomNavigationBarView());
+          // Get.offAll(() => SaveDataView());
+          // Get.offAll(() => SaveAdViewData());
         } else {
           Get.off(() => UsagePermissionScreen());
         }

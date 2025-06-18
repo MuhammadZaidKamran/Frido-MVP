@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:frido_app/Controller/permission_controllers.dart';
 import 'package:frido_app/Global/colors.dart';
 import 'package:frido_app/Global/global.dart';
-import 'package:frido_app/View/Home/home_view.dart';
+import 'package:frido_app/View/BottomNavigationBar/Home/home_view.dart';
 import 'package:frido_app/View/PermissionView/location_permission_screen.dart';
 import 'package:frido_app/View/PermissionView/usage_permission_screen.dart';
 import 'package:frido_app/Widgets/my_button.dart';
