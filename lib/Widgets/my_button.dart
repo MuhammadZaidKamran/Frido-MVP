@@ -2,9 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:frido_app/Global/colors.dart';
 import 'package:get/get.dart';
 
-// ignore: must_be_immutable
 class MyButton extends StatelessWidget {
-  MyButton({
+  final double? height;
+  final double? width;
+  final String label;
+  final VoidCallback onTap;
+  final BorderRadius? borderRadius;
+  final bool secondary;
+  final bool isLoading;
+  final FontWeight? btnFontWeight;
+  final Gradient? gradient;
+  final Color? textColor;
+  final Color? loadingColor;
+
+  const MyButton({
     super.key,
     this.height,
     this.width,
@@ -14,48 +25,56 @@ class MyButton extends StatelessWidget {
     this.secondary = false,
     this.borderRadius,
     this.btnFontWeight,
+    this.gradient,
+    this.textColor,
+    this.loadingColor,
   });
-  final double? height;
-  final double? width;
-  final String label;
-  final VoidCallback onTap;
-  final BorderRadius? borderRadius;
-  bool secondary = false;
-  bool isLoading = false;
-  final FontWeight? btnFontWeight;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: isLoading ? null : onTap,
+      borderRadius: borderRadius ?? BorderRadius.circular(20),
       child: Container(
         height: height ?? 55,
         width: width ?? Get.width,
         decoration: BoxDecoration(
+          gradient: gradient ?? (secondary 
+              ? null 
+              : LinearGradient(
+                  colors: [mainThemeColor, mainThemeColor],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )),
           border: Border.all(
-            color: secondary == true ? borderColor : Colors.transparent,
+            color: secondary ? borderColor : Colors.transparent,
+            width: secondary ? 1 : 0,
           ),
           borderRadius: borderRadius ?? BorderRadius.circular(20),
-          color: secondary == true ? whiteColor : mainThemeColor,
+          color: gradient == null 
+              ? (secondary ? whiteColor : mainThemeColor)
+              : null,
         ),
         child: Center(
-          child:
-              isLoading
-                  ? Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: CircularProgressIndicator.adaptive(
-                      backgroundColor: blackColor,
-                      valueColor: AlwaysStoppedAnimation<Color>(whiteColor),
-                    ),
-                  )
-                  : Text(
-                    label,
-                    style: TextStyle(
-                      color: secondary == true ? blackColor : whiteColor,
-                      fontSize: 16,
-                      fontWeight: btnFontWeight ?? FontWeight.w500,
+          child: isLoading
+              ? SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      loadingColor ?? (secondary ? blackColor : whiteColor),
                     ),
                   ),
+                )
+              : Text(
+                  label,
+                  style: TextStyle(
+                    color: textColor ?? (secondary ? blackColor : whiteColor),
+                    fontSize: 16,
+                    fontWeight: btnFontWeight ?? FontWeight.w500,
+                  ),
+                ),
         ),
       ),
     );

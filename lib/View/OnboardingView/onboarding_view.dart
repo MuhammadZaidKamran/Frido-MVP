@@ -10,8 +10,7 @@ class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _OnboardingScreenState createState() => _OnboardingScreenState();
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
@@ -26,27 +25,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           PageView(
             controller: _controller,
             onPageChanged: (index) {
-              setState(
-                () => index == 2 ? isLastPage = true : isLastPage = false,
-              );
+              setState(() => isLastPage = index == 2);
             },
             children: [
-              buildPage(
+              _buildPage(
                 title: "Your Data. Your Rules.",
-                description:
-                    "Every tap, scroll, and swipe tells a story — your story. Frido helps you take control of your digital behavior and turn it into value, on your terms.",
+                description: "Every tap, scroll, and swipe tells a story — your story. Frido helps you take control of your digital behavior and turn it into value, on your terms.",
                 image: "assets/images/onboard1.png",
               ),
-              buildPage(
+              _buildPage(
                 title: "Earn From Your Attention",
-                description:
-                    "Brands pay millions to reach people like you With Frido, you get paid simply being you — viewing, engaging, or even just receiving offers.",
+                description: "Brands pay millions to reach people like you With Frido, you get paid simply being you — viewing, engaging, or even just receiving offers.",
                 image: "assets/images/onboard2.png",
               ),
-              buildPage(
+              _buildPage(
                 title: "Masked. Secure. Always.",
-                description:
-                    "Your personal identity stays hidden. Frido uses  personas to match you with relevant promotions — privacy-first, always.",
+                description: "Your personal identity stays hidden. Frido uses personas to match you with relevant promotions — privacy-first, always.",
                 image: "assets/images/onboard3.png",
               ),
             ],
@@ -55,73 +49,73 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             bottom: 60,
             left: 20,
             right: 20,
-            child:
-                isLastPage
-                    ? MyButton(
-                      onTap: () {
-                        Get.off(() =>  SignUpView());
-                      },
-                      label: "Get Started",
-                    )
-                    : Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextButton(
-                          onPressed: () {
-                            _controller.jumpToPage(2);
-                          },
-                          child: Text(
-                            "Skip",
-                            style: TextStyle(
-                              color: Colors.black45,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
+            child: isLastPage
+                ? MyButton(
+                    onTap: () => Get.off(() =>  SignUpView()),
+                    label: "Get Started",
+                    gradient: LinearGradient(
+                      colors: [mainThemeColor, Colors.purple[600]!],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () => _controller.jumpToPage(2),
+                        child: Text(
+                          "Skip",
+                          style: TextStyle(
+                            color: mainThemeColor, // Using theme color
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                        SmoothPageIndicator(
-                          controller: _controller,
-                          count: 3,
-                          effect: ExpandingDotsEffect(
-                            dotHeight: 8,
-                            dotWidth: 8,
-                            activeDotColor: mainThemeColor,
+                      ),
+                      SmoothPageIndicator(
+                        controller: _controller,
+                        count: 3,
+                        effect: ExpandingDotsEffect(
+                          dotHeight: 8,
+                          dotWidth: 8,
+                          activeDotColor: mainThemeColor,
+                        ),
+                      ),
+                      Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [mainThemeColor, Colors.purple[600]!],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
                         ),
-                        InkWell(
+                        child: InkWell(
                           onTap: () {
                             _controller.nextPage(
                               duration: Duration(milliseconds: 500),
                               curve: Curves.easeIn,
                             );
                           },
-                          child: Container(
-                            height: 70,
-                            width: 70,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
-                              gradient: LinearGradient(
-                                colors: [Color(0xffA774FE), Color(0xff4C1F99)],
-                                end: Alignment.bottomCenter,
-                                begin: Alignment.topCenter,
-                              ),
-                            ),
-                            child: Icon(
-                              Icons.arrow_forward,
-                              color: Colors.white,
-                              size: 32,
-                            ),
+                          child: Icon(
+                            Icons.arrow_forward,
+                            color: Colors.white,
+                            size: 24,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
+                  ),
           ),
         ],
       ),
     );
   }
 
-  Widget buildPage({
+  Widget _buildPage({
     required String title,
     required String description,
     required String image,
@@ -130,23 +124,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       padding: myPadding,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Center(child: Image.asset(image, height: 300, fit: BoxFit.cover)),
+          Image.asset(image, height: 300, fit: BoxFit.contain),
           myHeight(0.06),
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: mainThemeColor, // Using theme color for headings
             ),
             textAlign: TextAlign.center,
           ),
           myHeight(0.02),
           Text(
             description,
-            style: const TextStyle(fontSize: 12),
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[600],
+            ),
             textAlign: TextAlign.center,
           ),
         ],

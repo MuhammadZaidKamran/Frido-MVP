@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:frido_app/Global/colors.dart';
 import 'package:frido_app/Global/global.dart';
 import 'package:frido_app/Widgets/my_button.dart';
-import 'package:get/route_manager.dart';
-import 'package:get/utils.dart';
+import 'package:get/get.dart';
 
-class PromoOfferDetailsView extends StatefulWidget {
+class PromoOfferDetailsView extends StatelessWidget {
   const PromoOfferDetailsView({
     super.key,
     required this.name,
@@ -15,6 +14,7 @@ class PromoOfferDetailsView extends StatefulWidget {
     required this.expireTime,
     required this.image,
   });
+
   final String name;
   final String shortDescription;
   final String longDescription;
@@ -23,217 +23,204 @@ class PromoOfferDetailsView extends StatefulWidget {
   final String image;
 
   @override
-  State<PromoOfferDetailsView> createState() => _PromoOfferDetailsViewState();
-}
-
-class _PromoOfferDetailsViewState extends State<PromoOfferDetailsView> {
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size(Get.width, Get.height * 0.23),
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          width: Get.width,
-          height: Get.height * 0.23,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(15),
-              bottomRight: Radius.circular(15),
-            ),
-            gradient: LinearGradient(
-              tileMode: TileMode.mirror,
-              colors: [mainThemeColor, mainThemeColor.withOpacity(0.65)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            // color: mainThemeColor,
-          ),
-          child: Hero(
-            tag: AssetImage("assets/images/nike-air.jpg"),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                myHeight(0.03),
-                Row(
-                  children: [
-                    InkWell(
-                      onTap: () => Get.back(),
-                      child: Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: whiteColor,
-                      ),
-                    ),
-                    myWidth(0.04),
-                    Text(
-                      "Offer Details",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: whiteColor,
-                      ),
-                    ),
-                  ],
+      backgroundColor: Colors.grey[100],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // Header section
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [mainThemeColor, mainThemeColor.withOpacity(0.65)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
                 ),
-                myHeight(0.04),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    (widget.image == null || widget.image == "")
-                        ? Icon(Icons.image_not_supported_sharp, size: 40)
-                        : CircleAvatar(
-                          radius: 30,
-                          backgroundImage: NetworkImage(widget.image),
-                        ),
-                    myWidth(0.045),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: [
-                        Text(
-                          widget.name,
-                          style: TextStyle(
-                            fontSize: 21,
-                            fontWeight: FontWeight.w600,
-                            color: whiteColor,
-                          ),
+                        InkWell(
+                          onTap: () => Get.back(),
+                          child: Icon(Icons.arrow_back_ios_new_rounded, color: whiteColor),
                         ),
-                        SizedBox(
-                          width: Get.width * 0.4,
-                          child: Text(
-                            widget.shortDescription,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: whiteColor,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                        const SizedBox(width: 12),
+                        const Text(
+                          "Offer Details",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
                           ),
                         ),
                       ],
                     ),
-                    Spacer(),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.yellow.shade100,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            widget.offerType,
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
+                    const SizedBox(height: 30),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundColor: Colors.grey[200],
+                          backgroundImage: (image.isEmpty)
+                              ? null
+                              : NetworkImage(image),
+                          child: image.isEmpty
+                              ? const Icon(Icons.image_not_supported, size: 32)
+                              : null,
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                name,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                shortDescription,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white.withOpacity(0.85),
+                                ),
+                              ),
+                            ],
                           ),
-                          myWidth(0.01),
-                          Image.asset(
-                            "assets/images/token.png",
-                            height: Get.height * 0.025,
-                            width: Get.width * 0.04,
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.shade200,
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                        ],
-                      ),
+                          child: Row(
+                            children: [
+                              Text(
+                                "+$offerType",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Image.asset(
+                                "assets/images/token.png",
+                                height: 18,
+                                width: 18,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+
+              // Body content
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                child: Column(
+                  children: [
+                    _buildInfoCard(
+                      title: "Offer Duration:",
+                      value: expireTime,
+                      badge: "New",
+                    ),
+                    const SizedBox(height: 20),
+                    _buildInfoCard(
+                      title: "Offer Description:",
+                      value: longDescription,
+                      badge: null,
+                    ),
+                    const SizedBox(height: 30),
+                    MyButton(onTap: () {}, label: "Claim Offer"),
+                    const SizedBox(height: 30),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.all(8),
-              width: Get.width,
-              decoration: BoxDecoration(
-                color: borderColor.withOpacity(0.35),
-                borderRadius: BorderRadius.circular(12),
+    );
+  }
+
+  Widget _buildInfoCard({
+    required String title,
+    required String value,
+    String? badge,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: borderColor.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
+              color: blackColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: blackColor,
+                  ),
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Offer Duration:",
+              if (badge != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: greenColor.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    badge,
                     style: TextStyle(
-                      fontSize: 17,
+                      fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: blackColor,
                     ),
                   ),
-                  myHeight(0.01),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        widget.expireTime,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: blackColor,
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: greenColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "New",
-                            style: TextStyle(fontSize: 14, color: blackColor),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            myHeight(0.02),
-            Container(
-              padding: EdgeInsets.all(8),
-              width: Get.width,
-              decoration: BoxDecoration(
-                color: borderColor.withOpacity(0.35),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Offer Description:",
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: blackColor,
-                    ),
-                  ),
-                  myHeight(0.01),
-                  Text(
-                    widget.longDescription,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      color: blackColor,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            myHeight(0.03),
-            MyButton(onTap: () {}, label: "Claim Offer"),
-          ],
-        ),
+                )
+            ],
+          ),
+        ],
       ),
     );
   }

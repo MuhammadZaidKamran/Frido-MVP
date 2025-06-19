@@ -1,12 +1,9 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:frido_app/Global/colors.dart';
-import 'package:frido_app/Global/global.dart';
 import 'package:frido_app/View/BottomNavigationBar/Promotions/ad_view.dart';
 import 'package:frido_app/View/BottomNavigationBar/Promotions/promo_offer_details_view.dart';
-import 'package:frido_app/Widgets/my_tab_bar.dart';
-import 'package:get/route_manager.dart';
-import 'package:get/utils.dart';
+import 'package:get/get.dart';
 
 class PromotionView extends StatefulWidget {
   const PromotionView({super.key});
@@ -15,414 +12,311 @@ class PromotionView extends StatefulWidget {
   State<PromotionView> createState() => _PromotionViewState();
 }
 
-class _PromotionViewState extends State<PromotionView> {
+class _PromotionViewState extends State<PromotionView> with SingleTickerProviderStateMixin {
   final promoView = FirebaseDatabase.instance.ref('promoView');
   final adView = FirebaseDatabase.instance.ref('adView');
   List promoList = [];
   List adList = [];
-
-  getPromoList() async {
-    await promoView.get().then((value) {
-      promoList = value.children.map((e) => e.value).toList();
-    });
-    print("promoList: $promoList");
-    setState(() {});
-  }
-
-  getAdList() async {
-    await adView.get().then((value) {
-      adList = value.children.map((e) => e.value).toList();
-    });
-    print("adList: $adList");
-    setState(() {});
-  }
-
-  initMethod() async {
-    await getPromoList();
-    await getAdList();
-  }
+  late TabController _tabController;
+  bool _isLoading = true;
 
   @override
   void initState() {
-    initMethod();
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    setState(() => _isLoading = true);
+    await Future.wait([_getPromoList(), _getAdList()]);
+    setState(() => _isLoading = false);
+  }
+
+  Future<void> _getPromoList() async {
+    final snapshot = await promoView.get();
+    if (snapshot.exists) {
+      promoList = snapshot.children.map((e) => e.value).toList();
+    }
+  }
+
+  Future<void> _getAdList() async {
+    final snapshot = await adView.get();
+    if (snapshot.exists) {
+      adList = snapshot.children.map((e) => e.value).toList();
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        backgroundColor: Colors.grey[200],
-        appBar: PreferredSize(
-          preferredSize: Size(Get.width, Get.height * 0.2),
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            width: Get.width,
-            height: Get.height * 0.2,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(15),
-                bottomRight: Radius.circular(15),
-              ),
-              gradient: LinearGradient(
-                tileMode: TileMode.mirror,
-                colors: [mainThemeColor, mainThemeColor.withOpacity(0.65)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-              // color: mainThemeColor,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      body: Column(
+        children: [
+          _buildAppBar(),
+          _buildTabBar(),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
               children: [
-                myHeight(0.06),
-                Text(
-                  "Promotions",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-                myHeight(0.02),
-                MyTabBar(tabOne: "Promo Viewer", tabTwo: "Ad Viewer"),
+                _isLoading ? _buildLoadingList() : _buildPromoList(),
+                _isLoading ? _buildLoadingList() : _buildAdList(),
               ],
             ),
-          ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppBar() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [mainThemeColor, Colors.purple.shade600],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-          child: TabBarView(
-            children: [
-
-              // Promo Viewer
-              ListView.separated(
-                shrinkWrap: true,
-                itemCount: promoList.length,
-                separatorBuilder: (context, index) => myHeight(0.02),
-                itemBuilder: (context, index) {
-                  final item = promoList[index];
-                  return GestureDetector(
-                    onTap:
-                        () => Get.to(
-                          () => PromoOfferDetailsView(
-                            name: item['name'],
-                            image: item['imageUrl'],
-                            expireTime: item['expireAt'],
-                            shortDescription: item['shortDescription'],
-                            longDescription: item['longDescription'],
-                            offerType: item['token']['view'],
-                          ),
-                        ),
-                    child: Hero(
-                      tag: Image.asset("assets/images/nike-air.jpg"),
-                      child: Material(
-                        borderRadius: BorderRadius.circular(20),
-                        elevation: 3,
-                        child: Container(
-                          // height: Get.height * 0.2,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: whiteColor,
-                            border: Border.all(color: borderColor),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            children: [
-                              (item['imageUrl'] == null ||
-                                      item['imageUrl'] == "")
-                                  ? Icon(
-                                    Icons.image_not_supported_sharp,
-                                    size: 40,
-                                  )
-                                  : CircleAvatar(
-                                    radius: 30,
-                                    backgroundImage: NetworkImage(
-                                      "${item['imageUrl']}",
-                                    ),
-                                  ),
-                              myWidth(0.025),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    width: Get.width * 0.4,
-                                    child: Text(
-                                      "${item['shortDescription']}",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  myHeight(0.01),
-                                  Text(
-                                    "${item['expireAt']}",
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                  myHeight(0.01),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 3,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.yellow.shade100,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          "${item['token']['view']}",
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        myWidth(0.01),
-                                        Image.asset(
-                                          "assets/images/token.png",
-                                          height: Get.height * 0.025,
-                                          width: Get.width * 0.04,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Spacer(),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: greenColor.withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        "New",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: blackColor,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  myHeight(0.02),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 6,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: mainThemeColor,
-                                      borderRadius: BorderRadius.circular(50),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          "View Offer",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: whiteColor,
-                                          ),
-                                        ),
-                                        Icon(
-                                          Icons.arrow_forward_ios_rounded,
-                                          size: 16,
-                                          color: whiteColor,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-
-
-              // Ad Viewer
-              ListView.separated(
-                shrinkWrap: true,
-                itemCount: adList.length,
-                separatorBuilder: (context, index) => myHeight(0.02),
-                itemBuilder: (context, index) {
-                  final item = adList[index];
-                  return GestureDetector(
-                    onTap:
-                        () => Get.to(
-                          () => AdOfferViewDetails(
-                            name: item['name'],
-                            shortDescription: item['shortDescription'],
-                            offerType: item['token'],
-                            expireAt: item['expireAt'],
-                          ),
-                        ),
-                    child: Hero(
-                      tag: Image.asset("assets/images/nike-air.jpg"),
-                      child: Material(
-                        borderRadius: BorderRadius.circular(20),
-                        elevation: 3,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: whiteColor,
-                            border: Border.all(color: borderColor),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            children: [
-                              // (item['imageUrl'] == null ||
-                              //         item['imageUrl'] == "")
-                              //     ?
-                              Icon(Icons.image_not_supported_sharp, size: 40),
-                              // :
-                              // CircleAvatar(
-                              //   radius: 30,
-                              //   backgroundImage: NetworkImage(
-                              //     "${item['imageUrl']}",
-                              //   ),
-                              // ),
-                              myWidth(0.025),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    width: Get.width * 0.4,
-                                    child: Text(
-                                      "${item['shortDescription']}",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  myHeight(0.01),
-                                  Text(
-                                    "${item['expireAt']}",
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                  myHeight(0.01),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 3,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.yellow.shade100,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          "${item['token']}",
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        myWidth(0.01),
-                                        Image.asset(
-                                          "assets/images/token.png",
-                                          height: Get.height * 0.025,
-                                          width: Get.width * 0.04,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Spacer(),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: greenColor.withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        "New",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: blackColor,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  myHeight(0.02),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 6,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: mainThemeColor,
-                                      borderRadius: BorderRadius.circular(50),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          "View Offer",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: whiteColor,
-                                          ),
-                                        ),
-                                        Icon(
-                                          Icons.arrow_forward_ios_rounded,
-                                          size: 16,
-                                          color: whiteColor,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            
-            ],
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(20),
+          bottomRight: Radius.circular(20),
+        ),
+      ),
+      padding: const EdgeInsets.only(top: 60, bottom: 20, left: 24, right: 24),
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text(
+            'Exclusive Offers',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
           ),
+          SizedBox(height: 6),
+          Text(
+            'Earn tokens by viewing promotions & ads',
+            style: TextStyle(color: Colors.white70, fontSize: 14),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabBar() {
+  return Container(
+    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    padding: const EdgeInsets.all(4),
+    decoration: BoxDecoration(
+      color: Colors.grey[200],
+      borderRadius: BorderRadius.circular(50),
+    ),
+    child: TabBar(
+      controller: _tabController,
+      indicator: BoxDecoration(
+        color: mainThemeColor,
+        borderRadius: BorderRadius.circular(50),
+      ),
+      labelColor: Colors.white,
+      unselectedLabelColor: Colors.black87,
+      labelStyle: const TextStyle(fontWeight: FontWeight.w600),
+      unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
+      indicatorPadding: const EdgeInsets.all(2),
+      indicatorSize: TabBarIndicatorSize.tab,
+      tabs: const [
+        Tab(text: 'Promotions'),
+        Tab(text: 'Advertisements'),
+      ],
+    ),
+  );
+}
+
+
+  Widget _buildLoadingList() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: 3,
+      itemBuilder: (_, index) => Container(
+        height: 150,
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPromoList() {
+    if (promoList.isEmpty) {
+      return _buildEmptyState("No promotions available", Icons.local_offer);
+    }
+    return RefreshIndicator(
+      onRefresh: _loadData,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: promoList.length,
+        itemBuilder: (context, index) {
+          final item = promoList[index];
+          return _buildOfferCard(
+            title: item['name'],
+            description: item['shortDescription'],
+            imageUrl: item['imageUrl'],
+            expiry: item['expireAt'],
+            tokens: item['token']['view'],
+            onTap: () => Get.to(() => PromoOfferDetailsView(
+                  name: item['name'],
+                  image: item['imageUrl'],
+                  expireTime: item['expireAt'],
+                  shortDescription: item['shortDescription'],
+                  longDescription: item['longDescription'],
+                  offerType: item['token']['view'],
+                )),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildAdList() {
+    if (adList.isEmpty) {
+      return _buildEmptyState("No ads available", Icons.ad_units);
+    }
+    return RefreshIndicator(
+      onRefresh: _loadData,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: adList.length,
+        itemBuilder: (context, index) {
+          final item = adList[index];
+          return _buildOfferCard(
+            title: item['name'],
+            description: item['shortDescription'],
+            expiry: item['expireAt'],
+            tokens: item['token'],
+            onTap: () => Get.to(() => AdOfferViewDetails(
+                  name: item['name'],
+                  shortDescription: item['shortDescription'],
+                  offerType: item['token'],
+                  expireAt: item['expireAt'],
+                )),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildOfferCard({
+    String? imageUrl,
+    required String title,
+    required String description,
+    required String expiry,
+    required dynamic tokens,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        elevation: 3,
+        margin: const EdgeInsets.only(bottom: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              child: imageUrl != null && imageUrl.isNotEmpty
+                  ? Image.network(
+                      imageUrl,
+                      height: 160,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    )
+                  : Container(
+                      height: 160,
+                      width: double.infinity,
+                      color: Colors.grey[200],
+                      child: const Icon(Icons.image, size: 40),
+                    ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  Text(description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: Colors.grey[700], fontSize: 14)),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Chip(
+                        backgroundColor: Colors.orange[50],
+                        avatar: const Icon(Icons.access_time, size: 16, color: Colors.orange),
+                        label: Text(
+                          expiry,
+                          style: const TextStyle(color: Colors.orange, fontSize: 12),
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.amber[600],
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
+                              "+$tokens",
+                              style: const TextStyle(
+                                  color: Colors.white, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(Icons.monetization_on_outlined,
+                                size: 18, color: Colors.white),
+                          ],
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(String message, IconData icon) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 48, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text(message,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: Colors.grey[600])),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: _loadData,
+              style: TextButton.styleFrom(foregroundColor: mainThemeColor),
+              child: const Text("Refresh"),
+            )
+          ],
         ),
       ),
     );

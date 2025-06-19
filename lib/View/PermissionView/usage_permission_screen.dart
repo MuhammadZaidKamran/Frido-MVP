@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frido_app/Controller/permission_controllers.dart';
 import 'package:frido_app/Global/colors.dart';
-import 'package:frido_app/Global/global.dart';
-import 'package:frido_app/View/PermissionView/location_permission_screen.dart';
-import 'package:frido_app/Widgets/my_button.dart';
+import 'package:frido_app/View/BottomNavigationBar/Home/home_view.dart';
+import 'package:frido_app/View/BottomNavigationBar/bottom_navigation_bar.dart';
 import 'package:get/get.dart';
-import 'package:get/utils.dart';
 
 class UsagePermissionScreen extends StatefulWidget {
   const UsagePermissionScreen({super.key});
@@ -15,66 +13,167 @@ class UsagePermissionScreen extends StatefulWidget {
 }
 
 class _UsagePermissionScreenState extends State<UsagePermissionScreen> {
+  bool _isLoading = false;
 
-  void checkUsagePermission()async {
-  bool isUsagePermissionGranted = await PermissionControllers.isUsagePermissionGranted();
-    print('usage permission : $isUsagePermissionGranted');
-
-   if(isUsagePermissionGranted){
-    Get.off(()=>LocationPermissionScreen());
-   }
-}
-
-@override
+  @override
   void initState() {
-    // TODO: implement initState
-    checkUsagePermission();
     super.initState();
+    _checkPermission();
   }
 
+  Future<void> _checkPermission() async {
+    setState(() => _isLoading = true);
+    final isGranted = await PermissionControllers.isUsagePermissionGranted();
+    setState(() => _isLoading = false);
+    
+    if (isGranted && mounted) {
+      Get.off(() => const BottomNavigationBarView());
+    }
+  }
 
-
+  Future<void> _requestPermission() async {
+    setState(() => _isLoading = true);
+    await PermissionControllers.openUsageSettings();
+    await _checkPermission();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: myPadding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            myHeight(0.15),
-            Center(
-              child: Image.asset(
-                "assets/images/usage_permission.png",
-                fit: BoxFit.cover,
-                height: Get.height * 0.35,
-              ),
+      body: Container(
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFF8F9FF), Color(0xFFEFF2FF)],
+          ),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Animated Icon
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        mainThemeColor.withOpacity(0.1),
+                        Colors.purple.withOpacity(0.1),
+                      ],
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.insights_rounded,
+                    size: 60,
+                    color: mainThemeColor,
+                  ),
+                ),
+
+                const SizedBox(height: 40),
+
+                // Title
+                Text(
+                  "Screen Time Access",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    color: mainThemeColor,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Description
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    "To show your app usage stats, we need screen time permission",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[700],
+                      height: 1.5,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+
+                const SizedBox(height: 40),
+
+                // Key Benefit
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.auto_awesome_rounded,
+                        color: mainThemeColor,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        "Get personalized insights",
+                        style: TextStyle(
+                          color: mainThemeColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 40),
+
+                // Permission button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _requestPermission,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: mainThemeColor,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 2,
+                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            "ALLOW ACCESS",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
             ),
-            myHeight(0.06),
-            Text(
-              "Screen Time Access",
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.w500,
-                color: textThemeColor,
-              ),
-            ),
-            myHeight(0.02),
-            Text(
-              "Grant Frido permission to track your screen time.",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w200),
-            ),
-            Spacer(),
-            MyButton(
-              onTap: () async {
-                await PermissionControllers.openUsageSettings().then((value) {
-                  checkUsagePermission();
-                });
-              },
-              label: "Allow Access",
-            ),
-          ],
+          ),
         ),
       ),
     );

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frido_app/Controller/home_controller.dart';
 import 'package:frido_app/Global/colors.dart';
 import 'package:frido_app/Global/global.dart';
-import 'package:frido_app/Widgets/category_row_widget.dart';
-import 'package:frido_app/Widgets/task_options_container.dart';
 import 'package:get/get.dart';
 
 class HomeView extends StatefulWidget {
@@ -15,13 +13,42 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   final HomeControllers homeController = HomeControllers();
-
   List<Map> appsStats = [];
   bool isLoading = true;
   String selectedFilter = 'daily';
   int tabIndex = 0;
   bool isExpanded = false;
   int totalUsage = 0;
+  String currentPersona = "Focused Fox";
+
+  // Predefined app categories with common apps
+  static const Map<String, List<String>> appCategories = {
+    'Social': [
+      'Instagram', 'Facebook', 'WhatsApp', 'Messenger',
+      'Twitter', 'Snapchat', 'LinkedIn', 'Telegram',
+      'Discord', 'Reddit', 'Pinterest', 'TikTok',
+      'ShareChat', 'Helo', 'Likee', 'MX TakaTak'
+    ],
+    'Entertainment': [
+      'YouTube', 'Netflix', 'Spotify', 'Disney+',
+      'Prime Video', 'Hotstar', 'JioCinema', 'ZEE5',
+      'SonyLIV', 'Voot', 'MX Player', 'Gaana',
+      'Wynk Music', 'Amazon Music', 'Apple Music', 'Spotify'
+    ],
+    'Productivity': [
+      'Gmail', 'Outlook', 'Google Drive', 'OneDrive',
+      'Microsoft Office', 'Slack', 'Zoom', 'Teams',
+      'Notion', 'Evernote', 'Todoist', 'Trello',
+      'Google Keep', 'Google Docs', 'Google Sheets'
+    ],
+    'Games': [
+      'PUBG', 'Free Fire', 'Candy Crush', 'Among Us',
+      'Clash of Clans', 'Clash Royale', 'Ludo King',
+      'Subway Surfers', 'Temple Run', '8 Ball Pool',
+      'Call of Duty', 'Asphalt', 'Genshin Impact'
+    ],
+    'Other': []
+  };
 
   @override
   void initState() {
@@ -29,30 +56,21 @@ class _HomeViewState extends State<HomeView> {
     fetchAppStats();
   }
 
-  // Helper function to format milliseconds to "Xh Ym"
   String formatHoursMinutes(int millis) {
     if (millis <= 0) return "0h 0m";
-
     int totalSeconds = millis ~/ 1000;
     int hours = totalSeconds ~/ 3600;
     int minutes = (totalSeconds % 3600) ~/ 60;
-
     return "${hours}h ${minutes}m";
   }
 
-  // Get the appropriate title based on selected filter
   String getScreenTimeTitle() {
     switch (selectedFilter) {
-      case 'daily':
-        return "Today, Screen Time";
-      case 'weekly':
-        return "This Week, Screen Time";
-      case 'monthly':
-        return "This Month, Screen Time";
-      case 'yearly':
-        return "This Year, Screen Time";
-      default:
-        return "Screen Time";
+      case 'daily': return "Today's Screen Time";
+      case 'weekly': return "This Week's Screen Time";
+      case 'monthly': return "This Month's Screen Time";
+      case 'yearly': return "This Year's Screen Time";
+      default: return "Screen Time";
     }
   }
 
@@ -64,227 +82,72 @@ class _HomeViewState extends State<HomeView> {
     });
 
     appsStats = await homeController.getAppStats(interval);
+    totalUsage = appsStats.fold(0, (sum, app) => sum + ((app['usageStats']?[interval] ?? 0) as int));
 
-    // Calculate total usage for the selected interval
-    totalUsage = 0;
-    for (var app in appsStats) {
-      totalUsage += ((app['usageStats']?[interval] ?? 0) as int);
+    setState(() => isLoading = false);
+  }
+
+  Map<String, int> getCategoryStats() {
+    final Map<String, int> categories = {};
+    for (final category in appCategories.keys) {
+      categories[category] = 0;
     }
 
-    setState(() {
-      isLoading = false;
-    });
+    for (final app in appsStats) {
+      final appName = app['name']?.toString() ?? 'Unknown';
+      final usage = (app['usageStats']?[selectedFilter] ?? 0) as int;
+      bool categorized = false;
+
+      for (final category in appCategories.keys) {
+        if (appCategories[category]!.any((pattern) => 
+            appName.toLowerCase().contains(pattern.toLowerCase()))) {
+          categories[category] = categories[category]! + usage;
+          categorized = true;
+          break;
+        }
+      }
+
+      if (!categorized) {
+        categories['Other'] = categories['Other']! + usage;
+      }
+    }
+
+    return categories;
+  }
+
+  IconData _getCategoryIcon(String category) {
+    switch (category) {
+      case 'Social': return Icons.people_alt;
+      case 'Entertainment': return Icons.movie;
+      case 'Productivity': return Icons.work;
+      case 'Games': return Icons.sports_esports;
+      default: return Icons.category;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final categoryStats = getCategoryStats();
+    final sortedCategories = categoryStats.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
     return Scaffold(
-      appBar: AppBar(backgroundColor: whiteColor, toolbarHeight: 10),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
+      backgroundColor: Colors.grey[50],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "Hello,Weekend",
-                style: TextStyle(
-                  fontSize: 21,
-                  fontWeight: FontWeight.w600,
-                  color: mainThemeColor,
-                ),
-              ),
-              myHeight(0.02),
-              Container(
-                padding: EdgeInsets.all(8),
-                width: Get.width,
-                decoration: BoxDecoration(
-                  color: whiteColor,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: blackColor.withOpacity(0.2),
-                      spreadRadius: 5,
-                      blurRadius: 10,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      getScreenTimeTitle(), // Dynamic title based on filter
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    myHeight(0.01),
-                    Text(
-                      formatHoursMinutes(totalUsage), // Dynamic total usage
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              myHeight(0.03),
-              Container(
-                decoration: BoxDecoration(
-                  color: whiteColor,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: blackColor.withOpacity(0.1),
-                      spreadRadius: 5,
-                      blurRadius: 10,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TaskOptionsContainer(
-                      title: "Daily",
-                      textColor: tabIndex == 0 ? whiteColor : mainThemeColor,
-                      backgroundColor:
-                          tabIndex == 0 ? mainThemeColor : whiteColor,
-                      borderColor:
-                          tabIndex == 0
-                              ? Colors.transparent
-                              : Colors.transparent,
-                      onTap: () {
-                        tabIndex = 0;
-                        fetchAppStats('daily');
-                      },
-                    ),
-                    Expanded(
-                      child: TaskOptionsContainer(
-                        title: "Weekly",
-                        textColor: tabIndex == 1 ? whiteColor : mainThemeColor,
-                        backgroundColor:
-                            tabIndex == 1 ? mainThemeColor : whiteColor,
-                        borderColor:
-                            tabIndex == 1
-                                ? Colors.transparent
-                                : Colors.transparent,
-                        onTap: () {
-                          tabIndex = 1;
-                          fetchAppStats('weekly');
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: TaskOptionsContainer(
-                        title: "Monthly",
-                        textColor: tabIndex == 2 ? whiteColor : mainThemeColor,
-                        backgroundColor:
-                            tabIndex == 2 ? mainThemeColor : whiteColor,
-                        borderColor:
-                            tabIndex == 2
-                                ? Colors.transparent
-                                : Colors.transparent,
-                        onTap: () {
-                          tabIndex = 2;
-                          fetchAppStats('monthly');
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: TaskOptionsContainer(
-                        title: "Yearly",
-                        textColor: tabIndex == 3 ? whiteColor : mainThemeColor,
-                        backgroundColor:
-                            tabIndex == 3 ? mainThemeColor : whiteColor,
-                        borderColor:
-                            tabIndex == 3
-                                ? Colors.transparent
-                                : Colors.transparent,
-                        onTap: () {
-                          tabIndex = 3;
-                          fetchAppStats('yearly');
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              myHeight(0.03),
-              Container(
-                padding: EdgeInsets.all(12),
-                width: Get.width,
-                decoration: BoxDecoration(
-                  color: whiteColor,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: blackColor.withOpacity(0.2),
-                      spreadRadius: 5,
-                      blurRadius: 10,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Top 5 Apps",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    myHeight(0.01),
-                    if (isLoading)
-                      Center(child: CircularProgressIndicator())
-                    else
-                      _buildAppListSection(),
-                  ],
-                ),
-              ),
-              myHeight(0.02),
-              Container(
-                padding: EdgeInsets.all(12),
-                width: Get.width,
-                decoration: BoxDecoration(
-                  color: whiteColor,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: blackColor.withOpacity(0.2),
-                      spreadRadius: 5,
-                      blurRadius: 10,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "App Categories",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    myHeight(0.01),
-                    CategoryRowWidget(title: "Social", duration: "2h 30m"),
-                    myHeight(0.01),
-                    CategoryRowWidget(
-                      title: "Entertainment",
-                      duration: "2h 30m",
-                    ),
-                    myHeight(0.01),
-                    CategoryRowWidget(title: "Production", duration: "2h 30m"),
-                  ],
-                ),
-              ),
+              _buildHeader(),
+              const SizedBox(height: 24),
+              _buildScreenTimeCard(),
+              const SizedBox(height: 24),
+              _buildTimePeriodSelector(),
+              const SizedBox(height: 24),
+              _buildTopAppsSection(),
+              const SizedBox(height: 24),
+              _buildCategoriesSection(sortedCategories),
             ],
           ),
         ),
@@ -292,64 +155,337 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget _buildAppListSection() {
-    // Filter out apps with zero usage
-    final nonZeroApps =
-        appsStats.where((app) {
-          final usage = app['usageStats']?[selectedFilter] ?? 0;
-          return usage > 0;
-        }).toList();
-
-    if (nonZeroApps.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20.0),
-          child: Text('No app usage data available'),
-        ),
-      );
-    }
-
-    // Determine which items to display
-    final itemsToDisplay =
-        isExpanded ? nonZeroApps : nonZeroApps.take(5).toList();
-
+  Widget _buildHeader() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ListView.separated(
-          padding: EdgeInsets.zero,
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: itemsToDisplay.length,
-          separatorBuilder: (context, index) => myHeight(0.03),
-          itemBuilder: (context, index) {
-            final app = itemsToDisplay[index];
-            return ListTile(
-              leading: homeController.imageFromBase64String(app['iconBase64']),
-              title: Text(app['name'] ?? 'Unknown App'),
-              trailing: Text(
-                homeController.formatDurationFromMillis(
-                  app['usageStats']?[selectedFilter] ?? 0,
+        Text(
+          "Hello, User!",
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: mainThemeColor,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          "Your current persona: $currentPersona",
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[600],
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildScreenTimeCard() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [mainThemeColor, Colors.purple[600]!],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: mainThemeColor.withOpacity(0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.phone_android, color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                getScreenTimeTitle(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-            );
-          },
-        ),
-        // Show toggle button only when there are more than 5 apps
-        if (nonZeroApps.length > 5)
-          Center(
-            child: TextButton(
-              onPressed: () {
-                setState(() {
-                  isExpanded = !isExpanded;
-                });
-              },
-              child: Text(
-                isExpanded ? 'See less items' : 'See all items',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            formatHoursMinutes(totalUsage),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 36,
+              fontWeight: FontWeight.bold,
             ),
           ),
-      ],
+          const SizedBox(height: 8),
+          LinearProgressIndicator(
+            value: 0.6,
+            backgroundColor: Colors.white.withOpacity(0.3),
+            valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+            minHeight: 8,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "You're ${_getComparisonText()} your ${selectedFilter} average",
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getComparisonText() => "20% below";
+
+  Widget _buildTimePeriodSelector() {
+    const List<String> periods = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
+    
+    return SizedBox(
+      height: 48,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: periods.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                tabIndex = index;
+                fetchAppStats(periods[index].toLowerCase());
+              });
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                color: tabIndex == index ? mainThemeColor : whiteColor,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: tabIndex == index ? Colors.transparent : Colors.grey[300]!,
+                ),
+                boxShadow: tabIndex == index
+                  ? [BoxShadow(
+                      color: mainThemeColor.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    )]
+                  : null,
+              ),
+              child: Center(
+                child: Text(
+                  periods[index],
+                  style: TextStyle(
+                    color: tabIndex == index ? Colors.white : Colors.grey[700],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildTopAppsSection() {
+    if (isLoading) return Center(child: CircularProgressIndicator());
+
+    final nonZeroApps = appsStats.where((app) {
+      return ((app['usageStats']?[selectedFilter] ?? 0) as int) > 0;
+    }).toList();
+
+    if (nonZeroApps.isEmpty) {
+      return Center(child: Text('No app usage data available'));
+    }
+
+    nonZeroApps.sort((a, b) => 
+      ((b['usageStats']?[selectedFilter] ?? 0) as int)
+      .compareTo((a['usageStats']?[selectedFilter] ?? 0) as int));
+
+    final displayedApps = isExpanded ? nonZeroApps : nonZeroApps.take(5).toList();
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: whiteColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Top Apps",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ...displayedApps.map((app) => _buildAppListItem(app)),
+          if (nonZeroApps.length > 5)
+            Center(
+              child: TextButton(
+                onPressed: () => setState(() => isExpanded = !isExpanded),
+                child: Text(
+                  isExpanded ? 'Show Less' : 'Show All',
+                  style: TextStyle(
+                    color: mainThemeColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppListItem(Map app) {
+    final usage = (app['usageStats']?[selectedFilter] ?? 0) as int;
+    final percentage = totalUsage > 0 ? usage / totalUsage : 0.0;
+    
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.indigo[50],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: homeController.imageFromBase64String(app['iconBase64']),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  app['name'] ?? 'Unknown App',
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 4),
+                LinearProgressIndicator(
+                  value: percentage,
+                  backgroundColor: Colors.grey[200],
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    mainThemeColor.withOpacity(0.6)),
+                  minHeight: 4,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            formatHoursMinutes(usage),
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoriesSection(List<MapEntry<String, int>> categories) {
+    if (isLoading) return Center(child: CircularProgressIndicator());
+
+    final nonEmptyCategories = categories.where((e) => e.value > 0).toList();
+
+    if (nonEmptyCategories.isEmpty) {
+      return Center(child: Text('No category data available'));
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: whiteColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "App Categories",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ...nonEmptyCategories.map((entry) => _buildCategoryItem(entry)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryItem(MapEntry<String, int> entry) {
+    final percentage = totalUsage > 0 
+      ? (entry.value / totalUsage * 100).toStringAsFixed(0)
+      : "0";
+    
+    return ListTile(
+      leading: Icon(
+        _getCategoryIcon(entry.key),
+        color: mainThemeColor,
+        size: 30,
+      ),
+      title: Text(
+        entry.key,
+        style: const TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: 16,
+        ),
+      ),
+      subtitle: Text(
+        formatHoursMinutes(entry.value),
+        style: TextStyle(
+          color: Colors.grey[600],
+          fontSize: 14,
+        ),
+      ),
+      trailing: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: mainThemeColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          "$percentage%",
+          style: TextStyle(
+            color: mainThemeColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+      ),
     );
   }
 }

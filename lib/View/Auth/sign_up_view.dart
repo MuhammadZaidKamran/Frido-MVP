@@ -1,424 +1,288 @@
-// import 'package:cloud_functions/cloud_functions.dart';
-// import 'package:flutter/material.dart';
-// import 'package:frido_app/Controller/auth_controller.dart';
-// import 'package:frido_app/Global/colors.dart';
-// import 'package:frido_app/Global/global.dart';
-// import 'package:frido_app/View/Auth/login_view.dart';
-// import 'package:frido_app/View/Auth/otp_verification_view.dart';
-// import 'package:frido_app/Widgets/my_button.dart';
-// import 'package:frido_app/Widgets/my_text_field.dart';
-// import 'package:get/get.dart';
-
-// class SignUpView extends StatefulWidget {
-//   const SignUpView({super.key});
-
-//   @override
-//   State<SignUpView> createState() => _SignUpViewState();
-// }
-
-// class _SignUpViewState extends State<SignUpView> {
-// //
-//   final _toController = TextEditingController();
-//   final _subjectController = TextEditingController();
-//   final _messageController = TextEditingController();
-//   bool _loading = false;
-//   String _status = '';
-
-//   Future<void> sendEmail() async {
-//     setState(() {
-//       _loading = true;
-//       _status = '';
-//       _toController.text = 'mubashirmjjawed@gmail.com';
-//       _subjectController.text = 'your otp code ';
-//       _messageController.text = 'your otp code is 909090';
-//     });
-
-//     try {
-//       final callable = FirebaseFunctions.instance.httpsCallable('sendEmail');
-//       final result = await callable.call(<String, dynamic>{
-//         'to': _toController.text,
-//         'subject': _subjectController.text,
-//         'message': _messageController.text,
-//       });
-
-//       if (result.data['success'] == true) {
-//         setState(() {
-//           _status = 'Email sent successfully!';
-//         });
-//       } else {
-//         setState(() {
-//           _status = 'Failed to send email: ${result.data['error']}';
-//           print('/////////////////////////////////////////////// $_status');
-//         });
-//       }
-//     } catch (e) {
-//       setState(() {
-//         _status = 'Error: $e';
-//         print('/////////////////////////////////////////////// $_status');
-//       });
-//     }
-
-//     setState(() {
-//       _loading = false;
-//     });
-//   }
-
-//   @override
-//   void dispose() {
-//     _toController.dispose();
-//     _subjectController.dispose();
-//     _messageController.dispose();
-//     super.dispose();
-//   }
-// //
-
-//   final userNameController = TextEditingController();
-//   final emailController = TextEditingController();
-//   final _formKey = GlobalKey<FormState>();
-//   final authController = Get.put(AuthController());
-//   bool _isTermsAccepted = false;
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: GetBuilder<AuthController>(
-//         builder: (controller) {
-//           return Form(
-//             key: _formKey,
-//             child: Padding(
-//               padding: myPadding,
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   myHeight(0.15),
-//                   Center(
-//                     child: Text(
-//                       "Quick Signup",
-//                       style: TextStyle(fontSize: 30, color: Colors.black),
-//                     ),
-//                   ),
-//                   myHeight(0.06),
-//                   Text(
-//                     "Full Name",
-//                     style: TextStyle(
-//                       color: textThemeColor,
-//                       fontWeight: FontWeight.w500,
-//                       fontSize: 16,
-//                     ),
-//                   ),
-//                   myHeight(0.01),
-//                   MyTextField(
-//                     controller: userNameController,
-//                     label: "Your Name",
-//                   ),
-//                   myHeight(0.02),
-//                   Text(
-//                     "Email Address",
-//                     style: TextStyle(
-//                       color: textThemeColor,
-//                       fontWeight: FontWeight.w500,
-//                       fontSize: 16,
-//                     ),
-//                   ),
-//                   myHeight(0.01),
-//                   MyTextField(controller: emailController, label: "Your Email"),
-//                   myHeight(0.02),
-//                   Row(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       Checkbox(
-//                         activeColor: mainThemeColor,
-//                         value: _isTermsAccepted,
-//                         onChanged: (bool? value) {
-//                           setState(() {
-//                             _isTermsAccepted = value ?? false;
-//                           });
-//                         },
-//                       ),
-//                       SizedBox(
-//                         width: Get.width * 0.7,
-//                         // height: 50,
-//                         child: const Text(
-//                           'By creating an account  i accept Frido terms of use and  privacy policy ',
-//                           textAlign: TextAlign.start,
-//                           style: TextStyle(fontSize: 12),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                   myHeight(0.025),
-//                   // Text('$_status'),
-//                   myHeight(0.025),
-//                   MyButton(
-//                     onTap: () async {
-//                       sendEmail();
-//                       // Get.to(() => OtpVerificationView());
-//                       // await controller
-//                       //     .signUp(
-//                       //       name: userNameController.text.trim(),
-//                       //       email: emailController.text.trim(),
-//                       //     )
-//                       //     .then((value) {
-//                       //       userNameController.clear();
-//                       //       emailController.clear();
-//                       //     });
-//                     },
-//                     label: "Sign Up",
-//                     isLoading: _loading,
-//                   ),
-//                   myHeight(0.04),
-//                   Row(
-//                     mainAxisAlignment: MainAxisAlignment.center,
-//                     children: [
-//                       const Text("Already have an account? ",style:TextStyle(fontSize: 12) ,),
-//                       myWidth(0.01),
-//                       InkWell(
-//                         onTap: () {
-//                           Get.to(() => LoginView());
-//                         },
-//                         child: Text(
-//                           "Sign In here",
-//                           style: TextStyle(
-//                             color: mainThemeColor,
-//                             fontWeight: FontWeight.bold,
-//                             fontSize: 12
-//                           ),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
-
+import 'dart:convert';
 import 'dart:math';
+import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
-import 'package:frido_app/Controller/auth_controller.dart';
 import 'package:frido_app/Global/colors.dart';
-import 'package:frido_app/Global/global.dart';
-import 'package:frido_app/View/Auth/login_view.dart';
 import 'package:frido_app/View/Auth/otp_verification_view.dart';
 import 'package:frido_app/Widgets/my_button.dart';
 import 'package:frido_app/Widgets/my_text_field.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUpView extends StatefulWidget {
+  const SignUpView({super.key});
+
   @override
-  _SignUpViewState createState() => _SignUpViewState();
+  State<SignUpView> createState() => _SignUpViewState();
 }
 
 class _SignUpViewState extends State<SignUpView> {
-  final emailController = TextEditingController();
-  final userNameController = TextEditingController();
-  final otpController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  // final authController = Get.put(AuthController());
-  bool _isTermsAccepted = false;
-  bool _loading = false;
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  bool _termsAccepted = false;
+  bool _isLoading = false;
 
-  String? _generatedOtp;
-  String _status = '';
+  void _handleSignUp() async {
+  if (!_formKey.currentState!.validate()) return;
+  if (!_termsAccepted) {
+    Get.snackbar(
+      "Required", 
+      "Please accept terms & conditions",
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.red[400],
+      colorText: Colors.white,
+    );
+    return;
+  }
 
-  Future<void> sendOtp() async {
-    // Generate random 6-digit OTP
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+  setState(() => _isLoading = true);
+  
+  try {
+    // Generate OTP
     final otp = (Random().nextInt(900000) + 100000).toString();
-    setState(() {
-      _generatedOtp = otp;
-    });
+    final prefs = await SharedPreferences.getInstance();
+    
+    // Store OTP immediately for verification
+    await prefs.setString('otp', otp);
 
-    final url = Uri.parse(
-      'https://us-central1-frido-11d62.cloudfunctions.net/sendEmail',
+    // Send OTP via email
+    final response = await http.post(
+      Uri.parse('https://us-central1-frido-11d62.cloudfunctions.net/sendEmail'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'to': _emailController.text,
+        'subject': 'Your Frido Verification Code',
+        'message': 'Your OTP code is: $otp',
+      }),
     );
 
-    final body = {
-      'to': emailController.text,
-      'subject': 'Your OTP Code',
-      'message': 'Your OTP code is $otp',
-    };
-
-    try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(body),
-      );
-
-      if (response.statusCode == 200) {
-        setState(() => _status = 'OTP sent to ${emailController.text}');
-        prefs.setString('otp', otp); // Store OTP in local storage
-        Get.to(
-          () => OtpVerificationView(
-            emailController: emailController,
-            userNameController: userNameController,
-          ),
-        ); // Navigate to verification screen
-        // store otp in local storage
-        // navigate to verification screen
-        print('///////////////////////$_status');
-      } else {
-        setState(() => _status = 'Failed: ${response.body}');
-        print('///////////////////////$_status');
-      }
-    } catch (e) {
-      setState(() => _status = 'Error: $e');
-      print('///////////////////////$_status');
+    if (response.statusCode == 200) {
+      Get.to(() => OtpVerificationView(
+        emailController: _emailController,
+        userNameController: _nameController,
+      ));
+    } else {
+      throw Exception('Failed to send OTP: ${response.statusCode}');
     }
+  } catch (e) {
+    Get.snackbar(
+      "Error",
+      "Couldn't send OTP. Please try again.",
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.red[400],
+      colorText: Colors.white,
+    );
+    debugPrint('OTP Error: $e');
+  } finally {
+    setState(() => _isLoading = false);
   }
+}
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GetBuilder<AuthController>(
-        builder: (controller) {
-          return Form(
-            key: _formKey,
-            child: Padding(
-              padding: myPadding,
+      body: Container(
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFF8F9FF), Color(0xFFEFF2FF)],
+          ),
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              top: -100,
+              right: -100,
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [
+                      mainThemeColor.withOpacity(0.1),
+                      Colors.purple.withOpacity(0.1),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  myHeight(0.15),
-                  Center(
-                    child: Text(
-                      "Quick Signup",
-                      style: TextStyle(fontSize: 30, color: Colors.black),
-                    ),
-                  ),
-                  myHeight(0.06),
-                  Text(
-                    "Full Name",
-                    style: TextStyle(
-                      color: textThemeColor,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                    ),
-                  ),
-                  myHeight(0.01),
-                  MyTextField(
-                    controller: userNameController,
-                    label: "Your Name",
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your name';
-                      }
-                      return null;
-                    },
-                  ),
-                  myHeight(0.02),
-                  Text(
-                    "Email Address",
-                    style: TextStyle(
-                      color: textThemeColor,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                    ),
-                  ),
-                  myHeight(0.01),
-                  MyTextField(
-                    controller: emailController,
-                    label: "Your Email",
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
-                      } else if (!GetUtils.isEmail(value)) {
-                        return 'Please enter a valid email';
-                      }
-                      return null;
-                    },
-                  ),
-                  myHeight(0.02),
-                  Row(
+                  const SizedBox(height: 80),
+
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Checkbox(
-                        activeColor: mainThemeColor,
-                        value: _isTermsAccepted,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            _isTermsAccepted = value ?? false;
-                          });
-                        },
+                      Text(
+                        "Join Frido",
+                        style: TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.w800,
+                          color: mainThemeColor,
+                          height: 0.9,
+                        ),
                       ),
-                      SizedBox(
-                        width: Get.width * 0.7,
-                        // height: 50,
-                        child: const Text(
-                          'By creating an account  i accept Frido terms of use and  privacy policy ',
-                          textAlign: TextAlign.start,
-                          style: TextStyle(fontSize: 12),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Let's get you started in 30 seconds",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[600],
                         ),
                       ),
                     ],
                   ),
-                  // myHeight(0.025),
-                  // Text('$_status'),
-                  myHeight(0.025),
-                  MyButton(
-                    onTap: () async {
-                      if (!_isTermsAccepted) {
-                        myErrorSnackBar(
-                          context: Get.context!,
-                          message:
-                              "Please accept the terms and conditions to proceed.",
-                        );
-                      } else if (_formKey.currentState!.validate()) {
-                        await sendOtp();
-                      }
-                      // sendEmail();
-                      // Get.to(() => OtpVerificationView());
-                      // await controller
-                      //     .signUp(
-                      //       name: userNameController.text.trim(),
-                      //       email: emailController.text.trim(),
-                      //     )
-                      //     .then((value) {
-                      //       userNameController.clear();
-                      //       emailController.clear();
-                      //     });
-                    },
-                    label: "Sign Up",
-                    isLoading: _loading,
+
+                  const SizedBox(height: 60),
+
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 30,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          // Name Field
+                          MyTextField(
+                            controller: _nameController,
+                            label: "Full Name",
+                            // prefixIcon: Icons.person_outline_rounded,
+                            floatingLabel: true,
+                            labelStyle: TextStyle(
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
+                            borderColor: Colors.grey[200],
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // Email Field
+                          MyTextField(
+                            controller: _emailController,
+                            label: "Email Address",
+                            // prefixIcon: Icons.email_outlined,
+                            floatingLabel: true,
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your email';
+                              } else if (!GetUtils.isEmail(value)) {
+                                return 'Enter a valid email address';
+                              }
+                              return null;
+                            },
+                            labelStyle: TextStyle(
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
+                            borderColor: Colors.grey[200],
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // Terms Checkbox
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Transform.scale(
+                                scale: 0.9,
+                                child: Checkbox(
+                                  value: _termsAccepted,
+                                  onChanged: (value) =>
+                                      setState(() => _termsAccepted = value ?? false),
+                                  activeColor: mainThemeColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: RichText(
+                                    text: TextSpan(
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 12,
+                                        height: 1.4,
+                                      ),
+                                      children: [
+                                        const TextSpan(text: 'By continuing, I agree to '),
+                                        TextSpan(
+                                          text: 'Terms of Service',
+                                          style: TextStyle(
+                                            color: mainThemeColor,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const TextSpan(text: ' and '),
+                                        TextSpan(
+                                          text: 'Privacy Policy',
+                                          style: TextStyle(
+                                            color: mainThemeColor,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // Continue Button
+                          MyButton(
+                            onTap: _handleSignUp,
+                            label: "GET VERIFICATION CODE",
+                            isLoading: _isLoading,
+                            height: 56,
+                            gradient: LinearGradient(
+                              colors: [mainThemeColor, Colors.purple[600]!],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            // labelStyle: const TextStyle(
+                            //   fontSize: 15,
+                            //   fontWeight: FontWeight.w600,
+                            //   letterSpacing: 0.5,
+                            // ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  // myHeight(0.04),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.center,
-                  //   children: [
-                  //     const Text(
-                  //       "Already have an account? ",
-                  //       style: TextStyle(fontSize: 12),
-                  //     ),
-                  //     myWidth(0.01),
-                  //     InkWell(
-                  //       onTap: () {
-                  //         Get.to(() => LoginView());
-                  //       },
-                  //       child: Text(
-                  //         "Sign In here",
-                  //         style: TextStyle(
-                  //           color: mainThemeColor,
-                  //           fontWeight: FontWeight.bold,
-                  //           fontSize: 12,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
                 ],
               ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }
