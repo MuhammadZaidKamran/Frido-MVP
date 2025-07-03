@@ -19,9 +19,9 @@ class _HomeViewState extends State<HomeView> {
   int tabIndex = 0;
   bool isExpanded = false;
   int totalUsage = 0;
+  int averageUsage = 0;
   String currentPersona = "Focused Fox";
 
-  // Predefined app categories with common apps
   static const Map<String, List<String>> appCategories = {
     'Social': [
       'Instagram', 'Facebook', 'WhatsApp', 'Messenger',
@@ -66,11 +66,16 @@ class _HomeViewState extends State<HomeView> {
 
   String getScreenTimeTitle() {
     switch (selectedFilter) {
-      case 'daily': return "Today's Screen Time";
-      case 'weekly': return "This Week's Screen Time";
-      case 'monthly': return "This Month's Screen Time";
-      case 'yearly': return "This Year's Screen Time";
-      default: return "Screen Time";
+      case 'daily':
+        return "Today's Screen Time";
+      case 'weekly':
+        return "This Week's Screen Time";
+      case 'monthly':
+        return "This Month's Screen Time";
+      case 'yearly':
+        return "This Year's Screen Time";
+      default:
+        return "Screen Time";
     }
   }
 
@@ -83,6 +88,9 @@ class _HomeViewState extends State<HomeView> {
 
     appsStats = await homeController.getAppStats(interval);
     totalUsage = appsStats.fold(0, (sum, app) => sum + ((app['usageStats']?[interval] ?? 0) as int));
+
+    // Dummy average value (replace this with actual API/controller call if available)
+    averageUsage = (totalUsage * 1.2).toInt(); // For example, assume 20% higher average
 
     setState(() => isLoading = false);
   }
@@ -99,8 +107,8 @@ class _HomeViewState extends State<HomeView> {
       bool categorized = false;
 
       for (final category in appCategories.keys) {
-        if (appCategories[category]!.any((pattern) => 
-            appName.toLowerCase().contains(pattern.toLowerCase()))) {
+        if (appCategories[category]!
+            .any((pattern) => appName.toLowerCase().contains(pattern.toLowerCase()))) {
           categories[category] = categories[category]! + usage;
           categorized = true;
           break;
@@ -117,11 +125,16 @@ class _HomeViewState extends State<HomeView> {
 
   IconData _getCategoryIcon(String category) {
     switch (category) {
-      case 'Social': return Icons.people_alt;
-      case 'Entertainment': return Icons.movie;
-      case 'Productivity': return Icons.work;
-      case 'Games': return Icons.sports_esports;
-      default: return Icons.category;
+      case 'Social':
+        return Icons.people_alt;
+      case 'Entertainment':
+        return Icons.movie;
+      case 'Productivity':
+        return Icons.work;
+      case 'Games':
+        return Icons.sports_esports;
+      default:
+        return Icons.category;
     }
   }
 
@@ -234,7 +247,7 @@ class _HomeViewState extends State<HomeView> {
           ),
           const SizedBox(height: 8),
           Text(
-            "You're ${_getComparisonText()} your ${selectedFilter} average",
+            "You're ${UsageUtils.getComparisonText(totalUsage, averageUsage)} your ${selectedFilter} average",
             style: const TextStyle(
               color: Colors.white70,
               fontSize: 14,
@@ -245,11 +258,9 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  String _getComparisonText() => "20% below";
-
   Widget _buildTimePeriodSelector() {
     const List<String> periods = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
-    
+
     return SizedBox(
       height: 48,
       child: ListView.separated(
@@ -273,12 +284,14 @@ class _HomeViewState extends State<HomeView> {
                   color: tabIndex == index ? Colors.transparent : Colors.grey[300]!,
                 ),
                 boxShadow: tabIndex == index
-                  ? [BoxShadow(
-                      color: mainThemeColor.withOpacity(0.2),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    )]
-                  : null,
+                    ? [
+                        BoxShadow(
+                          color: mainThemeColor.withOpacity(0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        )
+                      ]
+                    : null,
               ),
               child: Center(
                 child: Text(
@@ -307,9 +320,8 @@ class _HomeViewState extends State<HomeView> {
       return Center(child: Text('No app usage data available'));
     }
 
-    nonZeroApps.sort((a, b) => 
-      ((b['usageStats']?[selectedFilter] ?? 0) as int)
-      .compareTo((a['usageStats']?[selectedFilter] ?? 0) as int));
+    nonZeroApps.sort((a, b) => ((b['usageStats']?[selectedFilter] ?? 0) as int)
+        .compareTo((a['usageStats']?[selectedFilter] ?? 0) as int));
 
     final displayedApps = isExpanded ? nonZeroApps : nonZeroApps.take(5).toList();
 
@@ -359,7 +371,7 @@ class _HomeViewState extends State<HomeView> {
   Widget _buildAppListItem(Map app) {
     final usage = (app['usageStats']?[selectedFilter] ?? 0) as int;
     final percentage = totalUsage > 0 ? usage / totalUsage : 0.0;
-    
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Row(
@@ -387,7 +399,7 @@ class _HomeViewState extends State<HomeView> {
                   value: percentage,
                   backgroundColor: Colors.grey[200],
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    mainThemeColor.withOpacity(0.6)),
+                      mainThemeColor.withOpacity(0.6)),
                   minHeight: 4,
                   borderRadius: BorderRadius.circular(2),
                 ),
@@ -447,10 +459,10 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _buildCategoryItem(MapEntry<String, int> entry) {
-    final percentage = totalUsage > 0 
-      ? (entry.value / totalUsage * 100).toStringAsFixed(0)
-      : "0";
-    
+    final percentage = totalUsage > 0
+        ? (entry.value / totalUsage * 100).toStringAsFixed(0)
+        : "0";
+
     return ListTile(
       leading: Icon(
         _getCategoryIcon(entry.key),
@@ -487,5 +499,23 @@ class _HomeViewState extends State<HomeView> {
         ),
       ),
     );
+  }
+}
+
+// 📦 Utility Class
+class UsageUtils {
+  static String getComparisonText(int current, int average) {
+    if (average == 0) return "no average data";
+
+    final difference = current - average;
+    final percent = ((difference.abs() / average) * 100).toStringAsFixed(0);
+
+    if (difference > 0) {
+      return "$percent% above";
+    } else if (difference < 0) {
+      return "$percent% below";
+    } else {
+      return "exactly average";
+    }
   }
 }
